@@ -32,7 +32,7 @@ Choose the target, desktop, display backend, and optional features on the GitHub
 | Input | Values / default | Description |
 | --- | --- | --- |
 | `build_target` | Distribution, `all`, `all-wayland`; default `Debian-13` | Select build targets. |
-| `custom_username` | 1–32 letters, digits, `_`, or `-`, starting with a letter or `_`; default `Gold` | Normal RootFS user. |
+| `custom_username` | 1–32 letters, digits, `_`, or `-`, starting with a letter or `_`; default `arch` | Normal RootFS user. |
 | `desktop` | `none`, `KDE`, `KDE mobile`, `GNOME`, `Anland Next`, `Niri`; default `KDE` | Select desktop or command-line mode. |
 | `desktop_autostart` | `true` / `false`; default `true` | Installs the desktop startup service; must be disabled for `none`. |
 | `display_backend` | `x11` / `anland-wayland` | Defaults to Wayland in the Chinese workflow and X11 in the English workflow; some profiles force Wayland. |

@@ -22,7 +22,7 @@ on:
         description: 自定义用户名
         required: false
         type: string
-        default: Gold
+        default: arch
       desktop:
         description: 桌面选择
         required: true
