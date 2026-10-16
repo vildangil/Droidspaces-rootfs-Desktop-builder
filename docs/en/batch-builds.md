@@ -7,7 +7,8 @@ Select any number of distributions and desktop environments using GitHub's boole
 The default example enables:
 - Arch + GNOME
 - Arch + Niri
-- Debian 13 + GNOME
+
+Debian 13 and every other distribution are off by default. Check their boxes explicitly to include them.
 
 ## Supported combinations
 
@@ -32,3 +33,7 @@ Up to three target/profile builds run in parallel. A base RootFS from one Linux 
 All other advanced build options remain available through the upstream single-target workflow. View the planner and individual build jobs in the Actions page. Find each resulting `.tar.xz` archive on the repository's Releases page.
 
 **First boot:** change the default password after importing the rootfs. See [Quick Start](quick-start.md) and [AnLand setup](desktop-and-anland.md).
+
+## Arch GNOME ABI compatibility
+
+Arch Linux ARM is rolling-release. If its `gnome-shell` package depends on `libmutter-51.so` while the upstream AnLand GNOME release supplies patched Mutter 50 (`libmutter-50.so`), the rootfs build cannot produce a functioning GNOME AnLand desktop. The installer now reports this mismatch explicitly instead of suggesting that a forced pacman downgrade will help. Rebuild/update the corresponding patched Mutter in the separate `droidspaces-package` repository and set `wayland_package_repository` to that fork when its release is ready. Niri does not depend on GNOME's Mutter ABI.

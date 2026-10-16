@@ -10,7 +10,7 @@ on:
       distro_debian13:
         description: "Distribution: Debian 13"
         type: boolean
-        default: true
+        default: false
       distro_ubuntu24:
         description: "Distribution: Ubuntu 24"
         type: boolean
