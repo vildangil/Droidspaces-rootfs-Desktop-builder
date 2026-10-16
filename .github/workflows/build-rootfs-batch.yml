@@ -1,0 +1,160 @@
+name: Build multiple Droidspaces RootFS (multi-select)
+
+on:
+  workflow_dispatch:
+    inputs:
+      distro_arch:
+        description: "Distribution: Arch Linux ARM"
+        type: boolean
+        default: true
+      distro_debian13:
+        description: "Distribution: Debian 13"
+        type: boolean
+        default: true
+      distro_ubuntu24:
+        description: "Distribution: Ubuntu 24"
+        type: boolean
+        default: false
+      distro_ubuntu25:
+        description: "Distribution: Ubuntu 25"
+        type: boolean
+        default: false
+      distro_ubuntu26:
+        description: "Distribution: Ubuntu 26"
+        type: boolean
+        default: false
+      distro_fedora43:
+        description: "Distribution: Fedora 43"
+        type: boolean
+        default: false
+      distro_fedora44:
+        description: "Distribution: Fedora 44"
+        type: boolean
+        default: false
+      desktop_none:
+        description: "Desktop: none (CLI-only RootFS)"
+        type: boolean
+        default: false
+      desktop_kde:
+        description: "Desktop: KDE Plasma"
+        type: boolean
+        default: false
+      desktop_kde_mobile:
+        description: "Desktop: KDE Mobile"
+        type: boolean
+        default: false
+      desktop_gnome:
+        description: "Desktop: GNOME"
+        type: boolean
+        default: true
+      desktop_anland_next:
+        description: "Desktop: Anland Next"
+        type: boolean
+        default: false
+      desktop_niri:
+        description: "Desktop: Niri (Arch only)"
+        type: boolean
+        default: true
+      kde_backend:
+        description: "KDE Plasma display backend"
+        type: choice
+        options:
+          - anland-wayland
+          - x11
+        default: anland-wayland
+      custom_username:
+        description: "RootFS username"
+        type: string
+        default: Gold
+      desktop_autostart:
+        description: "Start desktop automatically (ignored for CLI)"
+        type: boolean
+        default: true
+      enable_mesa:
+        description: "Install Snapdragon GPU/Mesa integration"
+        type: boolean
+        default: true
+      enable_8gen2_wayland:
+        description: "Snapdragon 8 Gen 2 Wayland workaround"
+        type: boolean
+        default: false
+      enable_kfgj:
+        description: "Install development tools"
+        type: boolean
+        default: false
+      enable_zh_tz:
+        description: "Chinese language and Shanghai timezone"
+        type: boolean
+        default: false
+      enable_srf:
+        description: "Install Fcitx5"
+        type: boolean
+        default: false
+      wayland_package_repository:
+        description: "AnLand packages: owner/repo"
+        type: string
+        default: Goldzxcbug/droidspaces-package
+
+permissions:
+  contents: write
+
+concurrency:
+  group: droidspaces-batch-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Plan compatible combinations
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Select distributions and desktops
+        id: plan
+        env:
+          DISTRO_ARCH: ${{ inputs.distro_arch }}
+          DISTRO_DEBIAN_13: ${{ inputs.distro_debian13 }}
+          DISTRO_UBUNTU_24: ${{ inputs.distro_ubuntu24 }}
+          DISTRO_UBUNTU_25: ${{ inputs.distro_ubuntu25 }}
+          DISTRO_UBUNTU_26: ${{ inputs.distro_ubuntu26 }}
+          DISTRO_FEDORA_43: ${{ inputs.distro_fedora43 }}
+          DISTRO_FEDORA_44: ${{ inputs.distro_fedora44 }}
+          DESKTOP_NONE: ${{ inputs.desktop_none }}
+          DESKTOP_KDE: ${{ inputs.desktop_kde }}
+          DESKTOP_KDE_MOBILE: ${{ inputs.desktop_kde_mobile }}
+          DESKTOP_GNOME: ${{ inputs.desktop_gnome }}
+          DESKTOP_ANLAND_NEXT: ${{ inputs.desktop_anland_next }}
+          DESKTOP_NIRI: ${{ inputs.desktop_niri }}
+          KDE_BACKEND: ${{ inputs.kde_backend }}
+        run: bash scripts/ci/build-batch-matrix.sh
+
+  build:
+    name: ${{ matrix.target }} / ${{ matrix.desktop }} / ${{ matrix.backend }}
+    needs: plan
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    uses: ./.github/workflows/build-rootfs-core.yml
+    with:
+      ui_language: en
+      build_target: ${{ matrix.target }}
+      custom_username: ${{ inputs.custom_username }}
+      desktop: ${{ matrix.desktop }}
+      desktop_autostart: ${{ matrix.desktop != 'none' && inputs.desktop_autostart }}
+      display_backend: ${{ matrix.backend }}
+      PulseAudio: ${{ matrix.backend == 'x11' && matrix.desktop != 'none' && 'socket' || 'none' }}
+      enable_zh_tz: ${{ inputs.enable_zh_tz }}
+      enable_mesa: ${{ inputs.enable_mesa }}
+      enable_8gen2_wayland: ${{ inputs.enable_8gen2_wayland }}
+      nosnap: false
+      enable_systemd257: false
+      enable_srf: ${{ inputs.enable_srf }}
+      enable_binfmt: false
+      enable_yj: true
+      enable_kfgj: ${{ inputs.enable_kfgj }}
+      enable_zip: true
+      enable_docker: false
+      wayland_package_repository: ${{ inputs.wayland_package_repository }}
+      batch_key: batch-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.target }}-${{ matrix.desktop }}
