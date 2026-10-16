@@ -63,6 +63,10 @@ on:
         required: false
         type: string
         default: Goldzxcbug/droidspaces-package
+      batch_key:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   # --------------------------------------------------------
@@ -237,9 +241,14 @@ jobs:
         id: prep
         env:
           UI_LANGUAGE: ${{ inputs.ui_language }}
+          BATCH_KEY: ${{ inputs.batch_key }}
         run: |
           BUILD_DATE=$(date +'%Y-%m-%d %H:%M:%S')
           BUILD_ID="v$(date +'%Y%m%d-%H%M%S')"
+          if [ -n "$BATCH_KEY" ]; then
+            [[ "$BATCH_KEY" =~ ^[A-Za-z0-9_-]+$ ]] || { echo "Invalid batch key" >&2; exit 1; }
+            BUILD_ID="${BUILD_ID}-${BATCH_KEY}"
+          fi
           echo "build_date=$BUILD_DATE" >> "$GITHUB_OUTPUT"
           echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
           if [ "$UI_LANGUAGE" = zh ]; then
@@ -295,7 +304,7 @@ jobs:
       - name: ${{ inputs.ui_language == 'zh' && '上传构建产物' || 'Upload build artifacts' }}
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ matrix.template }}-${{ needs.setup.outputs.desktop }}-rootfs
+          name: ${{ inputs.batch_key != '' && format('{0}-{1}-{2}-rootfs', inputs.batch_key, matrix.template, needs.setup.outputs.desktop) || format('{0}-{1}-rootfs', matrix.template, needs.setup.outputs.desktop) }}
           path: "*.tar.xz"
           retention-days: 1
 
@@ -318,7 +327,7 @@ jobs:
       - name: ${{ inputs.ui_language == 'zh' && '下载全部构建产物' || 'Download all artifacts' }}
         uses: actions/download-artifact@v7
         with:
-          pattern: "*-rootfs"
+          pattern: ${{ inputs.batch_key != '' && format('{0}-*-rootfs', inputs.batch_key) || '*-rootfs' }}
           merge-multiple: true
 
       - name: ${{ inputs.ui_language == 'zh' && '整理发布文件' || 'Organize release files' }}
