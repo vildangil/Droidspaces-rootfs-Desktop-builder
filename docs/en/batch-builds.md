@@ -11,6 +11,10 @@ Arch + GNOME is available as an explicit opt-in, but currently requires rebuilt 
 
 Debian 13 and every other distribution are off by default. Check their boxes explicitly to include them.
 
+## GPU family
+
+Select `gpu_profile=mediatek-mali` for Mali/MediaTek. It turns off the Qualcomm-only KGSL Mesa installer and 8 Gen 2 workarounds, regardless of their checkbox values. It does **not** automatically enable native Mali hardware acceleration for AnLand. See [MediaTek / ARM Mali support](mediatek-mali.md) for required kernel GPU buffer interfaces and an X11/VirGL fallback.
+
 ## Supported combinations
 
 Compatibility comes directly from `scripts/lib/desktop-config.sh`, so the batch planner stays in sync with the original builder.
