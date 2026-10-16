@@ -26,7 +26,7 @@ Create or import a container and select the downloaded `.tar.xz` as its RootFS. 
 
 If `desktop_autostart` was enabled, `desktop-session.service` starts the selected desktop when the container starts. Otherwise, log in as the normal user and run the desktop command shown in the [desktop startup guide](desktop-and-anland.md).
 
-The default username is `Gold` and the default password is `1234` (use your custom username if you changed it during the build). Change the password after the first login:
+The default username is `arch` and the default password is `1234` (use your custom username if you changed it during the build). Change the password after the first login:
 
 ```bash
 passwd
