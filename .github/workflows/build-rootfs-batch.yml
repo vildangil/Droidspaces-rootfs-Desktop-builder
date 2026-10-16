@@ -44,9 +44,9 @@ on:
         type: boolean
         default: false
       desktop_gnome:
-        description: "Desktop: GNOME"
+        description: "Desktop: GNOME (requires matching patched Mutter release)"
         type: boolean
-        default: true
+        default: false
       desktop_anland_next:
         description: "Desktop: Anland Next"
         type: boolean
