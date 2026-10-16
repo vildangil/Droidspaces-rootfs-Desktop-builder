@@ -5,8 +5,9 @@ Use **Actions → Build multiple Droidspaces RootFS (multi-select) → Run workf
 Select any number of distributions and desktop environments using GitHub's boolean checkboxes. The workflow builds each supported distribution/desktop pair on a native ARM64 runner and publishes a **separate Release** for each pair. It leaves the original single-target workflows unchanged.
 
 The default example enables:
-- Arch + GNOME
 - Arch + Niri
+
+Arch + GNOME is available as an explicit opt-in, but currently requires rebuilt Mutter packages matching the rolling Arch `gnome-shell` ABI.
 
 Debian 13 and every other distribution are off by default. Check their boxes explicitly to include them.
 
