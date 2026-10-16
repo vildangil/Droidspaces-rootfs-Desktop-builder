@@ -1007,6 +1007,23 @@ install_arch_packages() {
         die "归档必须包含一个 Mutter 和一个 patched Xwayland 包。" "The archive must contain one Mutter and one patched Xwayland package."
     fi
 
+    # Arch is a rolling release. A prebuilt patched Mutter built against GNOME
+    # 50 cannot satisfy GNOME Shell 51's libmutter-51 ABI dependency.
+    # Check it before attempting pacman -U, and explain the actual remedy.
+    local installed_soname archive_soname archive_mutter=""
+    for file in "${files[@]}"; do
+        if [[ "$(LC_ALL=C pacman -Qp "$file" | awk 'NR == 1 {print $1}')" == mutter ]]; then
+            archive_mutter="$file"
+            break
+        fi
+    done
+    installed_soname="$(LC_ALL=C pacman -Qi gnome-shell | grep -Eo 'libmutter-[0-9]+[.]so' | head -n 1 || true)"
+    archive_soname="$(LC_ALL=C pacman -Qip "$archive_mutter" | grep -Eo 'libmutter-[0-9]+[.]so' | head -n 1 || true)"
+    if [[ -n "$installed_soname" && -n "$archive_soname" && "$installed_soname" != "$archive_soname" ]]; then
+        die "Arch GNOME Shell 依赖 $installed_soname，Anland Mutter 提供 $archive_soname。必须在 droidspaces-package 中重新编译匹配的 patched Mutter/Xwayland；不能强行忽略依赖。" \
+            "Arch GNOME Shell requires $installed_soname but the Anland release offers $archive_soname. Rebuild matching patched Mutter/Xwayland in droidspaces-package and select that package repository; do not force or ignore ABI dependencies."
+    fi
+
     pacman_conf="$(mktemp -t anland-gnome-pacman.XXXXXXXX)"
     cp /etc/pacman.conf "$pacman_conf"
     if grep -Eq '^[[:space:]]*#?[[:space:]]*LocalFileSigLevel[[:space:]]*=' "$pacman_conf"; then
