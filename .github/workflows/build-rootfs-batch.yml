@@ -70,8 +70,15 @@ on:
         description: "Start desktop automatically (ignored for CLI)"
         type: boolean
         default: true
+      gpu_profile:
+        description: "Android GPU: Qualcomm KGSL or MediaTek/ARM Mali"
+        type: choice
+        options:
+          - qualcomm-kgsl
+          - mediatek-mali
+        default: qualcomm-kgsl
       enable_mesa:
-        description: "Install Snapdragon GPU/Mesa integration"
+        description: "Install Qualcomm KGSL Mesa (ignored for MediaTek/Mali)"
         type: boolean
         default: true
       enable_8gen2_wayland:
@@ -146,8 +153,11 @@ jobs:
       display_backend: ${{ matrix.backend }}
       PulseAudio: ${{ matrix.backend == 'x11' && matrix.desktop != 'none' && 'socket' || 'none' }}
       enable_zh_tz: ${{ inputs.enable_zh_tz }}
-      enable_mesa: ${{ inputs.enable_mesa }}
-      enable_8gen2_wayland: ${{ inputs.enable_8gen2_wayland }}
+      # On Mali, never install Adreno/KGSL-specific Mesa overrides.
+      # Stock distro Mesa is kept; Mali accelerated AnLand still requires
+      # a compatible host DMA-BUF/DRM path and GPU driver.
+      enable_mesa: ${{ inputs.gpu_profile == 'qualcomm-kgsl' && inputs.enable_mesa }}
+      enable_8gen2_wayland: ${{ inputs.gpu_profile == 'qualcomm-kgsl' && inputs.enable_8gen2_wayland }}
       nosnap: false
       enable_systemd257: false
       enable_srf: ${{ inputs.enable_srf }}
