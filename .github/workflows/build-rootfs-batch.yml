@@ -65,7 +65,7 @@ on:
       custom_username:
         description: "RootFS username"
         type: string
-        default: Gold
+        default: arch
       desktop_autostart:
         description: "Start desktop automatically (ignored for CLI)"
         type: boolean
