@@ -42,3 +42,7 @@ All other advanced build options remain available through the upstream single-ta
 ## Arch GNOME ABI compatibility
 
 Arch Linux ARM is rolling-release. If its `gnome-shell` package depends on `libmutter-51.so` while the upstream AnLand GNOME release supplies patched Mutter 50 (`libmutter-50.so`), the rootfs build cannot produce a functioning GNOME AnLand desktop. The installer now reports this mismatch explicitly instead of suggesting that a forced pacman downgrade will help. Rebuild/update the corresponding patched Mutter in the separate `droidspaces-package` repository and set `wayland_package_repository` to that fork when its release is ready. Niri does not depend on GNOME's Mutter ABI.
+
+## Single GitHub Release
+
+The batch workflow invokes the reusable core with `publish_release: false`, disabling per-combination Releases. Once **all** selected matrix builds succeed, one final job downloads the archives for the current run and attempt only, verifies that the archive count matches the planned matrix, stages **one** draft release with tag `batch-<run_id>-<attempt>`, and publishes it. A failed build leaves its artifact accessible under the Actions run for debugging but produces no partial GitHub Release. Standalone build workflows keep the prior behavior.
