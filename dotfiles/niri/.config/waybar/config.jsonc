@@ -3,16 +3,14 @@
   "layer": "top",
   "position": "bottom",
   "height": 68,
-  "spacing": 8,
+  "spacing": 3,
   "margin-top": 0,
   "margin-bottom": 7,
-  "margin-left": 10,
-  "margin-right": 10,
+  "margin-left": 5,
+  "margin-right": 5,
   "fixed-center": true,
   "modules-left": [
     "custom/launcher",
-    "custom/terminal",
-    "custom/files",
     "custom/overview"
   ],
   "modules-center": [
@@ -21,10 +19,8 @@
     "custom/workspace-down"
   ],
   "modules-right": [
-    "pulseaudio",
-    "battery",
-    "clock",
-    "custom/keyboard"
+    "custom/keyboard",
+    "clock"
   ],
   "custom/launcher": {
     "format": "MENU",
@@ -42,7 +38,7 @@
     "on-click": "nautilus"
   },
   "custom/overview": {
-    "format": "OVERVIEW",
+    "format": "OVR",
     "tooltip": "Show all windows",
     "on-click": "niri msg action toggle-overview"
   },
@@ -75,7 +71,7 @@
     "tooltip-format": "{:%A, %d %B %Y}"
   },
   "custom/keyboard": {
-    "format": "KEYBOARD",
+    "format": "KB",
     "tooltip": "Show/hide touchscreen keyboard (Squeekboard)",
     "on-click": "bash $HOME/.local/bin/droidspaces-osk-toggle"
   }
