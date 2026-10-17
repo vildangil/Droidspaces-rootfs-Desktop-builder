@@ -21,6 +21,7 @@ Build ARM64 Linux RootFS images for Droidspaces on Android with GitHub Actions. 
 - [Batch-build multiple distributions and desktops using checkboxes](docs/en/batch-builds.md)
 - [Supported distributions and build options](docs/en/build-options.md)
 - [Desktop startup and Anland Wayland setup](docs/en/desktop-and-anland.md)
+- [Niri Touch tablet-style desktop defaults](docs/en/niri-touch.md)
 - [TUI, USB, firmware, and local builds](docs/en/advanced-usage.md)
 - [Script maintenance guide](scripts/README_english.md)
 
