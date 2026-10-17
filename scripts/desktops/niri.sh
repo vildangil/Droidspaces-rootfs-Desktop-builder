@@ -48,11 +48,11 @@ configure_environment() {
 install_arch() {
     pacman -S --noconfirm --needed \
         xdg-desktop-portal xdg-desktop-portal-gtk \
-        alacritty foot nautilus fuzzel mako waybar swaybg swaylock wl-clipboard \
+        foot thunar fuzzel mako waybar swaybg swaylock wl-clipboard \
         squeekboard pavucontrol \
         pipewire pipewire-alsa pipewire-pulse wireplumber upower \
         mesa-utils vulkan-tools clinfo dmidecode wayland-utils \
-        xdg-user-dirs glmark2 vkmark \
+        xdg-user-dirs \
         gst-plugins-base gst-plugins-good libcanberra sound-theme-freedesktop \
         noto-fonts noto-fonts-cjk noto-fonts-emoji
 }

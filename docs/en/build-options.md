@@ -52,6 +52,23 @@ Choose the target, desktop, display backend, and optional features on the GitHub
 
 For exact defaults, see `.github/workflows/build-rootfs-releases-en.yml` and `build-rootfs-releases.yml`. The multi-select workflow offers **two independent GPU checkboxes** (Qualcomm and MediaTek); both are selected by default. It builds each compatible desktop for both GPUs and publishes them as separately named archives in one release. See [Batch builds](batch-builds.md). `enable_systemd257` is experimental and adds build time. Systems already at systemd 257 or older skip installation; details are in the [script guide](../../scripts/README_english.md).
 
+## Browser and lightweight desktop defaults
+
+Graphical RootFS builds use **Firefox**, not Google Chrome. CLI-only (`none`) images do not install a browser. Native distribution packages are used where possible:
+
+| Distribution | Browser source |
+| --- | --- |
+| Debian 13 | `firefox-esr` from Debian |
+| Ubuntu 24/25/26 | `firefox` DEB from Mozilla's signed APT repository, **not** Ubuntu's Snap transitional package |
+| Fedora 43/44 | `firefox` from Fedora |
+| Arch Linux ARM | `firefox` from Arch Linux ARM (`extra`, aarch64) |
+
+The existing Google Chrome AUR build and external Google package repositories have been removed from the RootFS build. Firefox becomes the default handler for web links and HTML. The Mozilla APT key fingerprint is checked during Ubuntu builds.
+
+To avoid unnecessary duplicate tools, the Niri profile uses **Foot** and **Thunar** instead of installing Alacritty alongside Foot and Nautilus as its file manager. KDE Mobile no longer installs Angelfish by default; Firefox remains available. Optional GPU benchmark applications `glmark2` and `vkmark` are excluded from the default desktop package lists (they can be installed later with the distro package manager).
+
+Firefox is not guaranteed to use less RAM than Chrome for every workload. This change primarily reduces package duplication and avoids installing Chrome through AUR/Snap dependencies.
+
 ## Generated Droidspaces recommendations
 
 Native and QEMU builds generate `container.config` from the effective build options.

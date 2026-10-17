@@ -55,7 +55,7 @@ install_apt() {
                 dbus-x11 x11-xserver-utils fonts-noto-cjk fonts-noto-color-emoji qt6-wayland pipewire pipewire-alsa pipewire-pulse \
                 wireplumber ark upower konsole dolphin kate kinfocenter mesa-utils pulseaudio-utils vulkan-tools \
                 dbus-user-session clinfo dmidecode wayland-utils kfind \
-                filelight glmark2 vkmark kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
+                filelight kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
                 kimageformat6-plugins libcanberra-pulse gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
                 sound-theme-freedesktop
             ;;
@@ -64,7 +64,7 @@ install_apt() {
                 dbus-x11 x11-xserver-utils fonts-noto-cjk fonts-noto-color-emoji qt6-wayland pipewire pipewire-alsa pipewire-pulse \
                 wireplumber ark upower konsole dolphin kate kinfocenter mesa-utils pulseaudio-utils vulkan-tools \
                 dbus-user-session clinfo dmidecode wayland-utils kfind filelight \
-                glmark2 vkmark kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
+                  kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
                 kimageformat6-plugins libcanberra-pulse gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
                 sound-theme-freedesktop libpam-systemd libpam-modules libpam-kwallet5 language-pack-kde-zh-hans \
                 language-pack-zh-hans qt6-translations-l10n
@@ -86,7 +86,7 @@ install_fedora() {
         dbus-x11 xrandr xset xrdb xhost google-noto-cjk-fonts google-noto-emoji-color-fonts pipewire pipewire-alsa \
         pipewire-pulseaudio wireplumber ark upower konsole dolphin kate kinfocenter qt6-qtwayland glx-utils pulseaudio-utils \
         vulkan-tools clinfo dmidecode wayland-utils kfind \
-        filelight glmark2 vkmark kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
+        filelight kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
         kf6-kimageformats libcanberra-gtk3 gstreamer1-plugins-base gstreamer1-plugins-good sound-theme-freedesktop
 }
 
@@ -94,7 +94,7 @@ install_arch() {
     pacman -S --noconfirm --needed \
         xorg-xrandr noto-fonts-cjk noto-fonts-emoji qt6-wayland pipewire pipewire-alsa pipewire-pulse wireplumber ark upower konsole \
         dolphin kate kinfocenter mesa-utils libpulse vulkan-tools clinfo dmidecode wayland-utils kfind \
-        filelight glmark2 vkmark kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
+        filelight kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
         kimageformats libcanberra gstreamer gst-plugins-base gst-plugins-good sound-theme-freedesktop
 }
 
