@@ -9,6 +9,9 @@ on:
       - 'scripts/lib/rootfs-config.sh'
       - 'tests/test_rootfs_gpu_config.py'
       - 'build_rootfs-native.sh'
+      - 'scripts/configure-desktop.sh'
+      - 'scripts/start/desktop-session.service'
+      - 'tests/test_desktop_session_unit.py'
       - 'tests/test_gpu_batch_matrix.py'
   push:
     branches: [main]
@@ -19,6 +22,9 @@ on:
       - 'scripts/lib/rootfs-config.sh'
       - 'tests/test_rootfs_gpu_config.py'
       - 'build_rootfs-native.sh'
+      - 'scripts/configure-desktop.sh'
+      - 'scripts/start/desktop-session.service'
+      - 'tests/test_desktop_session_unit.py'
       - 'tests/test_gpu_batch_matrix.py'
 
 permissions:
@@ -40,3 +46,4 @@ jobs:
         run: |
           python3 -m unittest discover -s tests -p 'test_gpu_batch_matrix.py' -v
           python3 -m unittest discover -s tests -p 'test_rootfs_gpu_config.py' -v
+          python3 -m unittest discover -s tests -p 'test_desktop_session_unit.py' -v

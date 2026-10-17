@@ -132,9 +132,13 @@ if [[ "$desktop" == none ]]; then
     exit 0
 fi
 
+# Always ship the desktop unit for graphical images. A disabled
+# desktop_autostart setting should keep the unit disabled, *not* make it
+# impossible to start Niri manually or collect its journal diagnostics.
+install -Dm0644 "$templates/desktop-session.service" \
+    "$rootfs/etc/systemd/system/desktop-session.service"
+
 if [[ "$autostart" == true ]]; then
-    install -Dm0644 "$templates/desktop-session.service" \
-        "$rootfs/etc/systemd/system/desktop-session.service"
     install -d -m 0755 "$rootfs/etc/systemd/system/multi-user.target.wants"
     ln -sfn /etc/systemd/system/desktop-session.service \
         "$rootfs/etc/systemd/system/multi-user.target.wants/desktop-session.service"
