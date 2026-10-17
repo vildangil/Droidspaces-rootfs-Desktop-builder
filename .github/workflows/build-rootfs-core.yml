@@ -29,6 +29,10 @@ on:
       enable_zh_tz:
         required: true
         type: boolean
+      gpu_profile:
+        required: false
+        type: string
+        default: qualcomm-kgsl
       enable_mesa:
         required: true
         type: boolean
@@ -105,6 +109,7 @@ jobs:
           PULSEAUDIO_INPUT: ${{ inputs.PulseAudio }}
           UI_LANGUAGE: ${{ inputs.ui_language }}
           WAYLAND_PACKAGE_REPOSITORY: ${{ inputs.wayland_package_repository }}
+          GPU_PROFILE: ${{ inputs.gpu_profile }}
         run: |
           set -euo pipefail
           source scripts/lib/desktop-config.sh
@@ -174,6 +179,12 @@ jobs:
             fail "Wayland 软件包仓库必须使用公开的“所有者/仓库名”格式。" \
               "Wayland package repository must use the public owner/repository format."
           fi
+          case "$GPU_PROFILE" in
+            qualcomm-kgsl|mediatek-mali) ;;
+            *)
+              fail "无效的 GPU 配置：$GPU_PROFILE" "Invalid GPU profile: $GPU_PROFILE"
+              ;;
+          esac
           if [[ ! "$CUSTOM_USERNAME" =~ ^[A-Za-z_][A-Za-z0-9_-]{0,31}$ ]]; then
             fail "自定义用户名必须是 1 至 32 个字符的有效 Linux 用户名。" \
               "Custom username must be a 1-32 character Linux username."
@@ -231,6 +242,7 @@ jobs:
           echo "desktop_autostart=$DESKTOP_AUTOSTART" >> "$GITHUB_OUTPUT"
           echo "display_backend=$DISPLAY_BACKEND" >> "$GITHUB_OUTPUT"
           echo "pulseaudio_effective=$PULSE_AUDIO" >> "$GITHUB_OUTPUT"
+          message "GPU 配置：$GPU_PROFILE" "GPU profile: $GPU_PROFILE"
           message "最终构建矩阵：$TEMPLATES" "Final decided build matrix: $TEMPLATES"
           message "桌面环境：$DESKTOP" "Desktop profile: $DESKTOP"
           message "桌面开机自启动：$DESKTOP_AUTOSTART" \
@@ -292,17 +304,18 @@ jobs:
             -L "${{ needs.setup.outputs.desktop_autostart }}" \
             -B "${{ needs.setup.outputs.display_backend }}" \
             -P "${{ needs.setup.outputs.pulseaudio_effective }}" \
+            -G "${{ inputs.gpu_profile }}" \
             -g "${{ inputs.enable_zh_tz }}" \
             -a "${{ inputs.enable_binfmt }}" \
             -b "${{ inputs.enable_yj }}" \
-            -c "${{ inputs.enable_mesa }}" \
+            -c "${{ inputs.gpu_profile == 'qualcomm-kgsl' && inputs.enable_mesa }}" \
             -d "${{ inputs.enable_kfgj }}" \
             -e "${{ inputs.enable_zip }}" \
             -f "${{ inputs.enable_docker }}" \
             -h "${{ inputs.enable_srf }}" \
             -n "${{ inputs.nosnap }}" \
             -S "${{ inputs.enable_systemd257 }}" \
-            -t "${{ inputs.enable_8gen2_wayland }}" \
+            -t "${{ inputs.gpu_profile == 'qualcomm-kgsl' && inputs.enable_8gen2_wayland }}" \
             -u "$CUSTOM_USERNAME"
 
       - name: ${{ inputs.ui_language == 'zh' && '上传构建产物' || 'Upload build artifacts' }}
@@ -354,8 +367,9 @@ jobs:
           ENABLE_NOSNAP: ${{ inputs.nosnap }}
           ENABLE_SYSTEMD257: ${{ inputs.enable_systemd257 }}
           ENABLE_ZH_TZ: ${{ inputs.enable_zh_tz }}
-          ENABLE_MESA: ${{ inputs.enable_mesa }}
-          ENABLE_8GEN2_WAYLAND: ${{ inputs.enable_8gen2_wayland }}
+          GPU_PROFILE: ${{ inputs.gpu_profile }}
+          ENABLE_MESA: ${{ inputs.gpu_profile == 'qualcomm-kgsl' && inputs.enable_mesa }}
+          ENABLE_8GEN2_WAYLAND: ${{ inputs.gpu_profile == 'qualcomm-kgsl' && inputs.enable_8gen2_wayland }}
           ENABLE_FCITX5: ${{ inputs.enable_srf }}
           ENABLE_BINFMT: ${{ inputs.enable_binfmt }}
           ENABLE_HARDWARE: ${{ inputs.enable_yj }}
@@ -373,6 +387,7 @@ jobs:
 
           构建选项：
           - **自定义用户名**：$CUSTOM_USERNAME
+          - **GPU 配置**：$GPU_PROFILE
           - **桌面环境**：$DESKTOP
           - **桌面开机自启动**：$DESKTOP_AUTOSTART
           - **显示后端**：$DISPLAY_BACKEND
@@ -400,6 +415,7 @@ jobs:
 
           Build Options:
           - **Custom Username**: $CUSTOM_USERNAME
+          - **GPU profile**: $GPU_PROFILE
           - **Desktop**: $DESKTOP
           - **Desktop auto-start**: $DESKTOP_AUTOSTART
           - **Display backend**: $DISPLAY_BACKEND
@@ -424,9 +440,9 @@ jobs:
         id: stage-release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ needs.setup.outputs.build_id }}
+          tag_name: ${{ format('{0}-{1}', needs.setup.outputs.build_id, inputs.gpu_profile) }}
           target_commitish: ${{ github.sha }}
-          name: ${{ inputs.ui_language == 'zh' && format('Droidspaces 根文件系统 {0}', needs.setup.outputs.build_id) || format('Droidspaces RootFS {0}', needs.setup.outputs.build_id) }}
+          name: ${{ inputs.ui_language == 'zh' && format('Droidspaces 根文件系统 {0} ({1})', needs.setup.outputs.build_id, inputs.gpu_profile) || format('Droidspaces RootFS {0} ({1})', needs.setup.outputs.build_id, inputs.gpu_profile) }}
           files: "release_assets/*"
           body_path: release-notes.md
 
