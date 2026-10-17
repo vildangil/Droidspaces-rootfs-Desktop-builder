@@ -101,6 +101,9 @@ RUN if [ "$DISPLAY_BACKEND" = "anland-wayland" ]; then \
         ANLAND_RELEASE_REPOSITORY="$ANLAND_RELEASE_REPOSITORY" \
         ANLAND_NIRI_RELEASE_REPOSITORY="$ANLAND_RELEASE_REPOSITORY" \
         /usr/local/sbin/install-anland-desktop "$DESKTOP" --1 && \
+        if [ "$DESKTOP" = "niri" ]; then \
+            /usr/bin/niri-anland validate --config /etc/skel/.config/niri/config.kdl; \
+        fi && \
         echo "--> [enabled] Anland $DESKTOP support installed"; \
     fi
 
