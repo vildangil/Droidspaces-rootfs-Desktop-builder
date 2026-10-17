@@ -8,7 +8,23 @@ Both single-build workflows have a **GPU profile** choice, and the batch workflo
 - `mediatek-mali`: **never installs the Qualcomm KGSL Mesa packages** and does not write `KGSL`, `FD_FORCE_KGSL`, or Qualcomm 8 Gen 2 workarounds into the rootfs. All distro/desktop combinations still use the normal package manager and normal upstream AnLand compositor integration.
 
 Both variants carry the GPU label in their `.tar.xz` filename. For example, Arch + Niri with both GPUs checked creates one `qualcomm-kgsl` and one `mediatek-mali` archive in the **same batch Release**.
-\n**This is a safe Mali compatibility baseline, not a guarantee that AnLand rendering or 3D acceleration works on arbitrary MTK kernels.** In the MediaTek profile the separate `enable_mesa` checkbox is intentionally ignored (effective value `false`), because the bundled Mesa installer targets Adreno/KGSL and also includes an MSM-specific VA-API driver.
+
+**This is a safe Mali compatibility baseline, not a guarantee that AnLand rendering or 3D acceleration works on arbitrary MTK kernels.** In the MediaTek profile the separate `enable_mesa` checkbox is intentionally ignored (effective value `false`), because the bundled Mesa installer targets Adreno/KGSL and also includes an MSM-specific VA-API driver.
+
+## Imported Android container permissions
+
+DroidSpaces may show **"Settings were filled in for you"** when a RootFS
+archive includes its own `container.config`. Review the permissions before
+importing. For an AnLand Wayland desktop such as Niri, the generated defaults
+now request both `enable_anland=1` **and** `enable_gpu_mode=1` for **either**
+GPU profile. The latter controls Android-side GPU-device access; it is **not**
+the same thing as installing Qualcomm Mesa/KGSL into the RootFS.
+
+On MediaTek, the Qualcomm Mesa installer remains disabled even while
+**GPU Access** and **Anland Display** are both enabled. Full Hardware Access
+is not needed for this combination. An old archive created before this fix
+may have GPU Access disabled: enable it first in the DroidSpaces import UI,
+then enable Anland Display, or rebuild/download an archive containing the fix.
 
 ## What is required for hardware acceleration
 

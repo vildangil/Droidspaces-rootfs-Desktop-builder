@@ -6,6 +6,8 @@ on:
       - '.github/workflows/**'
       - 'scripts/ci/build-batch-matrix.sh'
       - 'scripts/lib/desktop-config.sh'
+      - 'scripts/lib/rootfs-config.sh'
+      - 'tests/test_rootfs_gpu_config.py'
       - 'build_rootfs-native.sh'
       - 'tests/test_gpu_batch_matrix.py'
   push:
@@ -14,6 +16,8 @@ on:
       - '.github/workflows/**'
       - 'scripts/ci/build-batch-matrix.sh'
       - 'scripts/lib/desktop-config.sh'
+      - 'scripts/lib/rootfs-config.sh'
+      - 'tests/test_rootfs_gpu_config.py'
       - 'build_rootfs-native.sh'
       - 'tests/test_gpu_batch_matrix.py'
 
@@ -33,4 +37,6 @@ jobs:
             bash -n "$profile"
           done
       - name: Test Qualcomm and MediaTek combinations
-        run: python3 -m unittest discover -s tests -p 'test_gpu_batch_matrix.py' -v
+        run: |
+          python3 -m unittest discover -s tests -p 'test_gpu_batch_matrix.py' -v
+          python3 -m unittest discover -s tests -p 'test_rootfs_gpu_config.py' -v

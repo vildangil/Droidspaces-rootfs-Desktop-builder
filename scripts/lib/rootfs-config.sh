@@ -17,7 +17,10 @@ write_rootfs_config() {
     case "$zh_tz_enabled" in true|false) ;; *) return 1 ;; esac
     [[ "$backend" == x11 && "$audio" == socket ]] && pulse=1
     [[ "$desktop" == kde || "$desktop" == kde-mobile ]] && userns=1
-    [[ "$gpu_enabled" == true ]] && gpu=1
+    # AnLand needs GPU access even with the MediaTek/Mali profile where
+    # the Qualcomm-specific Mesa installer is correctly disabled.
+    # This only requests GPU access, not unrestricted hardware access.
+    [[ "$gpu_enabled" == true || "$backend" == anland-wayland ]] && gpu=1
 
     {
         printf '%s\n' '# Droidspaces 推荐配置'
