@@ -103,6 +103,20 @@ class GpuBatchMatrixTests(unittest.TestCase):
             len({(x["target"], x["desktop"], x["gpu"]) for x in combos}), 6
         )
 
+    def test_legacy_systemd257_arch_niri_keeps_gpu_variants(self):
+        result, items = self.plan(LEGACY_SYSTEMD257="true")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(len(items), 2)
+        self.assertTrue(all(item["target"] == "Arch" and
+                            item["desktop"] == "niri" for item in items))
+
+    def test_legacy_systemd257_rejects_unvalidated_desktops(self):
+        result, items = self.plan(LEGACY_SYSTEMD257="true",
+                                  DESKTOP_GNOME="true")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("systemd 257 is not supported for gnome", result.stderr)
+        self.assertEqual(items, [])
+
     def test_kde_x11_backend_is_preserved_for_both_gpus(self):
         result, combos = self.plan(
             DESKTOP_NIRI="false", DESKTOP_KDE="true", KDE_BACKEND="x11"

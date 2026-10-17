@@ -7,7 +7,7 @@ profile_dir="${DROIDSPACES_DESKTOP_PROFILE_DIR:-/usr/local/lib/droidspaces/deskt
 case "${ENABLE_systemd257_ARG:-false}" in
     true)
         case "$desktop" in
-            none|kde) ;;
+            none|kde|niri) ;;
             *)
                 echo "systemd 257 构建只支持 none 和普通 KDE，拒绝安装：$desktop" >&2
                 exit 1
