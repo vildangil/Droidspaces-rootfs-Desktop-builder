@@ -49,3 +49,13 @@ Arch Linux ARM is rolling-release. If its `gnome-shell` package depends on `libm
 ## Single GitHub Release
 
 The batch workflow invokes the reusable core with `publish_release: false`, disabling per-combination Releases. Once **all** selected matrix builds (including both GPU variants, if checked) succeed, one final job downloads the archives for the current run and attempt only, verifies that the archive count matches the planned matrix, stages **one** draft release with tag `batch-<run_id>-<attempt>`, and publishes it. A failed build leaves its artifact accessible under the Actions run for debugging but produces no partial GitHub Release. Standalone build workflows keep the prior behavior.
+
+## Experimental systemd 257 for older Android kernels (Arch + Niri)
+
+Some Android kernels (notably Linux 4.14 and 4.19) cannot boot the rolling Arch Linux ARM systemd 258+ packages. A RootFS can successfully build but fail immediately at `/sbin/init` under DroidSpaces. This is a possible cause, **not a diagnosis from error 255 alone**. First inspect the actual host kernel and foreground DroidSpaces console.
+
+For a new Arch + Niri build, enable `legacy_systemd257` in batch Actions, or `enable_systemd257` in either standalone workflow. This option installs the pinned custom **systemd 257 family** from the `systemd257-packages` GitHub Release, verifies its archive checksum and locks related packages against pacman upgrade. The batch checkbox is off by default.
+
+Batch preflight rejects GNOME, KDE Mobile, and AnLand Next if legacy systemd is enabled, rather than silently replacing the chosen desktop with CLI mode. Niri support remains **experimental**: a passing RootFS build is not a device boot test, and older kernels may still lack required namespaces, cgroups, FBE keyring handling, or Android vendor support. Do not change host SELinux or apply unsafe /proc/sys flags merely to fix an init error.
+
+The existing container image is not modified by selecting the flag; a new archive and container import are required. Keep your original container until a replacement boots.
