@@ -44,7 +44,7 @@ install_apt() {
         gnome-terminal nautilus gnome-system-monitor gnome-tweaks
         gnome-keyring libpam-gnome-keyring polkitd upower
         pipewire pipewire-pulse wireplumber pulseaudio-utils
-        mesa-utils vulkan-tools aha clinfo dmidecode glmark2 vkmark
+        mesa-utils vulkan-tools aha clinfo dmidecode  
         wayland-utils xwayland xdg-user-dirs xdg-desktop-portal-gnome
         file-roller evince eog gstreamer1.0-plugins-base gstreamer1.0-plugins-good
         libcanberra-pulse sound-theme-freedesktop
@@ -80,7 +80,7 @@ install_arch() {
         gnome-terminal nautilus gnome-system-monitor gnome-tweaks \
         gnome-keyring polkit upower \
         pipewire pipewire-alsa pipewire-pulse wireplumber \
-        mesa-utils vulkan-tools aha clinfo dmidecode glmark2 vkmark \
+        mesa-utils vulkan-tools aha clinfo dmidecode \
         wayland-utils xorg-xwayland xdg-user-dirs xdg-desktop-portal-gnome \
         file-roller evince eog gst-plugins-base gst-plugins-good \
         libcanberra sound-theme-freedesktop gnome-backgrounds
