@@ -1,0 +1,31 @@
+name: Validate Niri Touch config
+
+on:
+  pull_request:
+    paths:
+      - dotfiles/niri/.config/niri/config.kdl
+      - .github/workflows/test-niri-touch.yml
+  push:
+    branches: [main]
+    paths:
+      - dotfiles/niri/.config/niri/config.kdl
+      - .github/workflows/test-niri-touch.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate-niri-touch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate config using the upstream Arch Niri parser
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/dotfiles/niri/.config/niri:/configs:ro" \
+            archlinux:latest bash -euc '
+              pacman -Sy --noconfirm --needed niri
+              niri validate --config /configs/config.kdl
+            '
