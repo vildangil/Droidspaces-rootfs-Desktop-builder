@@ -6,7 +6,7 @@ A touch-oriented **Niri Touch** default is bundled directly with the Arch + Niri
 
 - Niri: 92%-width main column, rounded corners, comfortable gaps and visible focus, overview hot corner and drag-to-edge scrolling
 - Waybar: large bottom touch dock (launcher, terminal, files, overview, workspace buttons, volume, battery, time, keyboard)
-- Fuzzel: large-text application launcher; Foot: legible terminal; Mako: compact notifications; Swaybg: dark solid wallpaper
+- Fuzzel: large-text application launcher; Foot: legible terminal; Thunar: lightweight file manager; Mako: compact notifications; Swaybg: dark solid wallpaper
 - Squeekboard: on-screen keyboard, with a keyboard toggle in the dock via its D-Bus interface
 - No login to external dotfiles repositories, tracking, or remote install scripts
 
