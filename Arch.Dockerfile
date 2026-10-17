@@ -36,6 +36,16 @@ COPY scripts/configure-desktop.sh /usr/local/sbin/configure-desktop
 COPY scripts/configure-chrome.sh /usr/local/sbin/configure-chrome
 COPY scripts/start-desktop-session.sh /usr/local/bin/start-desktop-session
 COPY scripts/desktops/ /usr/local/lib/droidspaces/desktops/
+# Touch-first Niri defaults are copied into the new user's home by useradd -m.
+# Install only for the Niri profile, preserving other desktops' default config.
+COPY dotfiles/niri/ /usr/local/share/droidspaces-niri-touch/
+RUN if [ "$DESKTOP" = "niri" ]; then \
+        install -d -m 0755 /etc/skel/.config && \
+        cp -a /usr/local/share/droidspaces-niri-touch/.config/. /etc/skel/.config/ && \
+        install -d -m 0755 /etc/skel/.local/bin && \
+        cp -a /usr/local/share/droidspaces-niri-touch/.local/bin/. /etc/skel/.local/bin/ && \
+        chmod 0755 /etc/skel/.local/bin/droidspaces-osk-toggle; \
+    fi
 COPY scripts/etc/wireplumber/wireplumber.conf.d/Anland-Audio.conf /tmp/Anland-Audio.conf
 RUN if [ "$DISPLAY_BACKEND" = "anland-wayland" ]; then \
         install -D -m 0644 /tmp/Anland-Audio.conf /etc/wireplumber/wireplumber.conf.d/Anland-Audio.conf; \
