@@ -19,12 +19,20 @@ configure_environment() {
         ANLAND_DRM_DEVICE=/dev/dri/renderD128
         ANLAND_SKIP_IMPLICIT_SYNC_WAIT=1
         XWAYLAND_GBM_DEVICE=/dev/dri/renderD128
-        MESA_LOADER_DRIVER_OVERRIDE=kgsl
-        GALLIUM_DRIVER=kgsl
-        FD_FORCE_KGSL=1
-        MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE=1
-        FD_DEV_FEATURES=enable_tp_ubwc_flag_hint=1
     )
+    # Only Qualcomm/Adreno builds should hardcode KGSL. This profile used to
+    # inject KGSL even when the new MediaTek/Mali option disabled Mesa.
+    if [[ "${ENABLE_mesa_ARG:-false}" == "true" ]]; then
+        assignments+=(
+            MESA_LOADER_DRIVER_OVERRIDE=kgsl
+            GALLIUM_DRIVER=kgsl
+            FD_FORCE_KGSL=1
+            MESA_VK_DEVICE_SELECT_FORCE_DEFAULT_DEVICE=1
+        )
+        if [[ "${ENABLE_8gen2_wayland_ARG:-false}" == "true" ]]; then
+            assignments+=(FD_DEV_FEATURES=enable_tp_ubwc_flag_hint=1)
+        fi
+    fi
 
     [[ "$backend" == anland-wayland ]] || {
         echo "Niri 显示后端无效：$backend" >&2
@@ -40,7 +48,8 @@ configure_environment() {
 install_arch() {
     pacman -S --noconfirm --needed \
         xdg-desktop-portal xdg-desktop-portal-gtk \
-        alacritty fuzzel mako waybar swaybg swaylock wl-clipboard \
+        alacritty foot nautilus fuzzel mako waybar swaybg swaylock wl-clipboard \\
+        squeekboard pavucontrol \
         pipewire pipewire-alsa pipewire-pulse wireplumber upower \
         mesa-utils vulkan-tools clinfo dmidecode wayland-utils \
         xdg-user-dirs glmark2 vkmark \
