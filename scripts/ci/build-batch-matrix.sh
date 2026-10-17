@@ -45,6 +45,25 @@ if (( ${#selected_desktops[@]} == 0 )); then
   exit 1
 fi
 
+case "${LEGACY_SYSTEMD257:-false}" in
+  true)
+    # The older systemd package family is currently known to work with
+    # CLI/KDE, and Niri on Arch is explicitly experimental. Never silently
+    # replace a requested desktop with CLI in a multi-build run.
+    for desktop in "${selected_desktops[@]}"; do
+      case "$desktop" in
+        none|kde|niri) ;;
+        *)
+          echo "systemd 257 is not supported for $desktop in the batch workflow; select none, KDE or Arch Niri." >&2
+          exit 1
+          ;;
+      esac
+    done
+    ;;
+  false) ;;
+  *) echo "LEGACY_SYSTEMD257 must be true or false." >&2; exit 1 ;;
+esac
+
 case "${KDE_BACKEND:-anland-wayland}" in
   x11|anland-wayland) ;;
   *) echo "Unsupported KDE backend: $KDE_BACKEND" >&2; exit 1 ;;
