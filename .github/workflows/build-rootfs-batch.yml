@@ -86,6 +86,10 @@ on:
         description: "Snapdragon 8 Gen 2 Wayland workaround"
         type: boolean
         default: false
+      legacy_systemd257:
+        description: "Experimental systemd 257 for old Android kernels (Arch Niri/KDE or CLI)"
+        type: boolean
+        default: false
       enable_kfgj:
         description: "Install development tools"
         type: boolean
@@ -137,6 +141,7 @@ jobs:
           KDE_BACKEND: ${{ inputs.kde_backend }}
           GPU_QUALCOMM: ${{ inputs.gpu_qualcomm }}
           GPU_MEDIATEK: ${{ inputs.gpu_mediatek }}
+          LEGACY_SYSTEMD257: ${{ inputs.legacy_systemd257 }}
         run: bash scripts/ci/build-batch-matrix.sh
 
   build:
@@ -161,7 +166,7 @@ jobs:
       enable_mesa: ${{ inputs.enable_mesa }}
       enable_8gen2_wayland: ${{ inputs.enable_8gen2_wayland }}
       nosnap: false
-      enable_systemd257: false
+      enable_systemd257: ${{ inputs.legacy_systemd257 }}
       enable_srf: ${{ inputs.enable_srf }}
       enable_binfmt: false
       enable_yj: true
