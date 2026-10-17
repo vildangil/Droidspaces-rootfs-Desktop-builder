@@ -35,7 +35,7 @@
   "custom/files": {
     "format": "FILES",
     "tooltip": "Open files",
-    "on-click": "nautilus"
+    "on-click": "thunar"
   },
   "custom/overview": {
     "format": "OVR",
