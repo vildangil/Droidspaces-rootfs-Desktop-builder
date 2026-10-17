@@ -70,13 +70,14 @@ on:
         description: "Start desktop automatically (ignored for CLI)"
         type: boolean
         default: true
-      gpu_profile:
-        description: "Android GPU: Qualcomm KGSL or MediaTek/ARM Mali"
-        type: choice
-        options:
-          - qualcomm-kgsl
-          - mediatek-mali
-        default: qualcomm-kgsl
+      gpu_qualcomm:
+        description: "GPU: Qualcomm Snapdragon / Adreno (KGSL)"
+        type: boolean
+        default: true
+      gpu_mediatek:
+        description: "GPU: MediaTek / ARM Mali (no KGSL packages)"
+        type: boolean
+        default: true
       enable_mesa:
         description: "Install Qualcomm KGSL Mesa (ignored for MediaTek/Mali)"
         type: boolean
@@ -134,10 +135,12 @@ jobs:
           DESKTOP_ANLAND_NEXT: ${{ inputs.desktop_anland_next }}
           DESKTOP_NIRI: ${{ inputs.desktop_niri }}
           KDE_BACKEND: ${{ inputs.kde_backend }}
+          GPU_QUALCOMM: ${{ inputs.gpu_qualcomm }}
+          GPU_MEDIATEK: ${{ inputs.gpu_mediatek }}
         run: bash scripts/ci/build-batch-matrix.sh
 
   build:
-    name: ${{ matrix.target }} / ${{ matrix.desktop }} / ${{ matrix.backend }}
+    name: ${{ matrix.target }} / ${{ matrix.desktop }} / ${{ matrix.gpu }} / ${{ matrix.backend }}
     needs: plan
     strategy:
       fail-fast: false
@@ -153,11 +156,10 @@ jobs:
       display_backend: ${{ matrix.backend }}
       PulseAudio: ${{ matrix.backend == 'x11' && matrix.desktop != 'none' && 'socket' || 'none' }}
       enable_zh_tz: ${{ inputs.enable_zh_tz }}
-      # On Mali, never install Adreno/KGSL-specific Mesa overrides.
-      # Stock distro Mesa is kept; Mali accelerated AnLand still requires
-      # a compatible host DMA-BUF/DRM path and GPU driver.
-      enable_mesa: ${{ inputs.gpu_profile == 'qualcomm-kgsl' && inputs.enable_mesa }}
-      enable_8gen2_wayland: ${{ inputs.gpu_profile == 'qualcomm-kgsl' && inputs.enable_8gen2_wayland }}
+      gpu_profile: ${{ matrix.gpu }}
+      # The shared core and native build guard against KGSL on Mali too.
+      enable_mesa: ${{ inputs.enable_mesa }}
+      enable_8gen2_wayland: ${{ inputs.enable_8gen2_wayland }}
       nosnap: false
       enable_systemd257: false
       enable_srf: ${{ inputs.enable_srf }}
@@ -167,7 +169,7 @@ jobs:
       enable_zip: true
       enable_docker: false
       wayland_package_repository: ${{ inputs.wayland_package_repository }}
-      batch_key: batch-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.target }}-${{ matrix.desktop }}
+      batch_key: batch-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.target }}-${{ matrix.desktop }}-${{ matrix.gpu }}
       publish_release: false
 
   release:
@@ -189,7 +191,6 @@ jobs:
       - name: Verify files and prepare release notes
         env:
           MATRIX_JSON: ${{ needs.plan.outputs.matrix }}
-          GPU_PROFILE: ${{ inputs.gpu_profile }}
           USERNAME: ${{ inputs.custom_username }}
           ANLAND_PACKAGES: ${{ inputs.wayland_package_repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -214,14 +215,13 @@ jobs:
             echo
             echo "- Build: $RUN_URL"
             echo "- Username: $USERNAME"
-            echo "- GPU profile: $GPU_PROFILE"
             echo "- AnLand packages: $ANLAND_PACKAGES"
             echo
             echo "## Built combinations"
             echo
-            echo '| Distribution | Desktop | Backend |'
-            echo '| --- | --- | --- |'
-            jq -r '.include[] | "| \(.target) | \(.desktop) | \(.backend) |"' <<<"$MATRIX_JSON"
+            echo '| Distribution | Desktop | GPU | Backend |'
+            echo '| --- | --- | --- | --- |'
+            jq -r '.include[] | "| \(.target) | \(.desktop) | \(.gpu) | \(.backend) |"' <<<"$MATRIX_JSON"
             echo
             echo "## Files"
             echo

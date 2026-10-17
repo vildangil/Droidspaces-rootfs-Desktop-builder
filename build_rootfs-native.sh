@@ -11,9 +11,10 @@ DESKTOP_AUTOSTART="false"
 ENABLE_nosnap="false"
 ENABLE_8gen2_wayland="false"
 ENABLE_systemd257="false"
+GPU_PROFILE="qualcomm-kgsl"
 DISPLAY_BACKEND_INPUT="X11"
 # 解析输入参数 (-i 指定 Dockerfile，-v 指定版本号)
-while getopts "i:v:K:L:B:P:a:b:c:d:e:f:g:h:n:S:t:u:A:" opt; do
+while getopts "i:v:K:L:B:P:G:a:b:c:d:e:f:g:h:n:S:t:u:A:" opt; do
   case $opt in
     i) DOCKERFILE="$OPTARG" ;; # -i 参数赋值给 DOCKERFILE 变量
     v) VERSION="$OPTARG" ;;    # -v 参数赋值给 VERSION 变量
@@ -21,6 +22,7 @@ while getopts "i:v:K:L:B:P:a:b:c:d:e:f:g:h:n:S:t:u:A:" opt; do
     L) DESKTOP_AUTOSTART="$OPTARG"  ;;
     B) DISPLAY_BACKEND_INPUT="$OPTARG" ;;
     P) PulseAudio="$OPTARG"  ;;
+    G) GPU_PROFILE="$OPTARG" ;;
     g) ENABLE_zh_tz="$OPTARG"  ;; # 中文支持
     a) ENABLE_binfmt="$OPTARG" ;; # -a 跨架构支持
     b) ENABLE_yj="$OPTARG" ;;
@@ -58,6 +60,16 @@ if ! DISPLAY_BACKEND="$(display_backend_normalize "$DISPLAY_BACKEND_INPUT")"; th
   exit 1
 fi
 case "$DESKTOP_AUTOSTART" in true|false) ;; *) echo "错误：-L 只支持 true 或 false。" >&2; exit 1 ;; esac
+case "$GPU_PROFILE" in
+  qualcomm-kgsl) ;;
+  mediatek-mali)
+    # MTK/Mali is not an Adreno KGSL GPU. Disable incompatible Mesa and
+    # Snapdragon-only workarounds even for direct shell invocations.
+    ENABLE_mesa=false
+    ENABLE_8gen2_wayland=false
+    ;;
+  *) echo "错误：-G 只支持 qualcomm-kgsl 或 mediatek-mali。" >&2; exit 1 ;;
+esac
 case "$ENABLE_systemd257" in
   true)
     case "$DESKTOP" in
@@ -125,6 +137,7 @@ echo " 容器识别部分硬件和网络：$ENABLE_yj"
 echo " Ubuntu nosnap：$ENABLE_nosnap"
 echo " systemd 257 旧内核兼容：$ENABLE_systemd257"
 echo " 修复骁龙8 Gen 2 Wayland 花屏：$ENABLE_8gen2_wayland"
+echo " GPU 配置：$GPU_PROFILE"
 echo " 桌面：$DESKTOP"
 echo " 显示后端：$DISPLAY_BACKEND"
 echo " 桌面自启动：$DESKTOP_AUTOSTART"
@@ -162,13 +175,13 @@ docker buildx inspect --bootstrap || echo "警告: 引导失败，尝试继续�
 set -e
 
 # 3. 核心构建流程
-TEMP_TAR="custom-${PREFIX}-${DESKTOP}-rootfs.tar"
+TEMP_TAR="custom-${PREFIX}-${DESKTOP}-${GPU_PROFILE}-rootfs.tar"
 if [ "$DESKTOP" = "none" ]; then
   DISPLAY_LABEL="CLI"
 else
   DISPLAY_LABEL="$(display_backend_label "$DISPLAY_BACKEND")"
 fi
-FINAL_NAME="${PREFIX}-${DESKTOP}-${DISPLAY_LABEL}-Droidspaces-rootfs-${ARCH}-${VERSION}.tar.xz"
+FINAL_NAME="${PREFIX}-${DESKTOP}-${DISPLAY_LABEL}-${GPU_PROFILE}-Droidspaces-rootfs-${ARCH}-${VERSION}.tar.xz"
 
 echo "正在运行 Docker Build (原生模式)..."
 
@@ -186,6 +199,7 @@ docker buildx build \
   --build-arg ENABLE_binfmt_ARG="$ENABLE_binfmt" \
   --build-arg ENABLE_yj_ARG="$ENABLE_yj" \
   --build-arg ENABLE_mesa_ARG="$ENABLE_mesa" \
+  --build-arg GPU_PROFILE_ARG="$GPU_PROFILE" \
   --build-arg ENABLE_kfgj_ARG="$ENABLE_kfgj" \
   --build-arg ENABLE_zip_ARG="$ENABLE_zip" \
   --build-arg ENABLE_docker_ARG="$ENABLE_docker" \

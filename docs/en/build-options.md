@@ -38,8 +38,8 @@ Choose the target, desktop, display backend, and optional features on the GitHub
 | `display_backend` | `x11` / `anland-wayland` | Defaults to Wayland in the Chinese workflow and X11 in the English workflow; some profiles force Wayland. |
 | `PulseAudio` | `socket` / `tcp` / `none`; default `socket` | X11 audio forwarding; Anland sets this to `none`. |
 | `enable_zh_tz` | `true` / `false` | Installs Chinese locale and Shanghai timezone; defaults differ by workflow. |
-| `enable_mesa` | `true` / `false`; default `true` | Adds Snapdragon GPU/Mesa support. |
-| `enable_8gen2_wayland` | `true` / `false`; default `false` | Sets the Turnip UBWC Wayland workaround for relevant devices. |
+| `gpu_profile` | `qualcomm-kgsl` / `mediatek-mali`; default `qualcomm-kgsl` | Single-build GPU profile; selected for English and Chinese workflows. |\n| `enable_mesa` | `true` / `false`; default `true` | Adds Qualcomm Snapdragon GPU/Mesa support *only* for the Qualcomm profile; automatically disabled for Mali. |
+| `enable_8gen2_wayland` | `true` / `false`; default `false` | Sets the Snapdragon 8 Gen 2 Turnip UBWC workaround only on the Qualcomm profile; disabled on Mali. |
 | `nosnap` | `true` / `false` | Ubuntu only: removes Snap and prevents APT from reinstalling it; defaults differ by workflow. |
 | `enable_systemd257` | `true` / `false`; default `false` | Tries the systemd 257 package family for old Android kernels; only `none` and standard `KDE` are supported. |
 | `enable_srf` | `true` / `false` | Installs Fcitx5; enabled by default in the Chinese workflow, disabled in English. |
@@ -50,7 +50,7 @@ Choose the target, desktop, display backend, and optional features on the GitHub
 | `enable_docker` | `true` / `false`; default `false` | Installs Docker packages in the RootFS. |
 | `wayland_package_repository` | Public `owner/repository`; default `Goldzxcbug/droidspaces-package` | Selects the source for prebuilt Anland package Releases, including Arch GNOME Mutter. |
 
-For exact defaults, see `.github/workflows/build-rootfs-releases-en.yml` and `build-rootfs-releases.yml`. `enable_systemd257` is experimental and adds build time. Systems already at systemd 257 or older skip installation; details are in the [script guide](../../scripts/README_english.md).
+For exact defaults, see `.github/workflows/build-rootfs-releases-en.yml` and `build-rootfs-releases.yml`. The multi-select workflow offers **two independent GPU checkboxes** (Qualcomm and MediaTek); both are selected by default. It builds each compatible desktop for both GPUs and publishes them as separately named archives in one release. See [Batch builds](batch-builds.md). `enable_systemd257` is experimental and adds build time. Systems already at systemd 257 or older skip installation; details are in the [script guide](../../scripts/README_english.md).
 
 ## Generated Droidspaces recommendations
 

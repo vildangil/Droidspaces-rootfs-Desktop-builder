@@ -2,12 +2,13 @@
 
 ## GPU selection
 
-The batch workflow now has **GPU profile**:
+Both single-build workflows have a **GPU profile** choice, and the batch workflow has independent Qualcomm and MediaTek checkboxes (both checked by default):
 
 - `qualcomm-kgsl`: existing Snapdragon Adreno integration and optional Qualcomm-oriented Mesa packages.
 - `mediatek-mali`: **never installs the Qualcomm KGSL Mesa packages** and does not write `KGSL`, `FD_FORCE_KGSL`, or Qualcomm 8 Gen 2 workarounds into the rootfs. All distro/desktop combinations still use the normal package manager and normal upstream AnLand compositor integration.
 
-**This is a safe Mali compatibility baseline, not a guarantee that AnLand rendering or 3D acceleration works on arbitrary MTK kernels.** In the MediaTek profile the separate `enable_mesa` checkbox is intentionally ignored (effective value `false`), because the bundled Mesa installer targets Adreno/KGSL and also includes an MSM-specific VA-API driver.
+Both variants carry the GPU label in their `.tar.xz` filename. For example, Arch + Niri with both GPUs checked creates one `qualcomm-kgsl` and one `mediatek-mali` archive in the **same batch Release**.
+\n**This is a safe Mali compatibility baseline, not a guarantee that AnLand rendering or 3D acceleration works on arbitrary MTK kernels.** In the MediaTek profile the separate `enable_mesa` checkbox is intentionally ignored (effective value `false`), because the bundled Mesa installer targets Adreno/KGSL and also includes an MSM-specific VA-API driver.
 
 ## What is required for hardware acceleration
 

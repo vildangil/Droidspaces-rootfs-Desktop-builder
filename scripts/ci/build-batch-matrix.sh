@@ -12,6 +12,17 @@ desktop_flags=(DESKTOP_NONE DESKTOP_KDE DESKTOP_KDE_MOBILE DESKTOP_GNOME DESKTOP
 
 selected_targets=()
 selected_desktops=()
+selected_gpus=()
+if [[ "${GPU_QUALCOMM:-false}" == "true" ]]; then
+  selected_gpus+=(qualcomm-kgsl)
+fi
+if [[ "${GPU_MEDIATEK:-false}" == "true" ]]; then
+  selected_gpus+=(mediatek-mali)
+fi
+if (( ${#selected_gpus[@]} == 0 )); then
+  echo "Select at least one GPU profile (Qualcomm or MediaTek)." >&2
+  exit 1
+fi
 for i in "${!targets[@]}"; do
   flag="${target_flags[$i]}"
   if [[ "${!flag:-false}" == "true" ]]; then
@@ -43,8 +54,8 @@ summary="${GITHUB_STEP_SUMMARY:-/dev/null}"
 {
   echo "## Selected RootFS builds"
   echo
-  echo "| Distribution | Desktop | Backend |"
-  echo "| --- | --- | --- |"
+  echo "| Distribution | Desktop | GPU profile | Backend |"
+  echo "| --- | --- | --- | --- |"
 } >> "$summary"
 
 matrix_items=()
@@ -60,8 +71,10 @@ for target in "${selected_targets[@]}"; do
     fi
 
     if desktop_backend_supported "$target" "$desktop" "$backend"; then
-      matrix_items+=("$(jq -cn --arg target "$target" --arg desktop "$desktop" --arg backend "$backend" '{target:$target,desktop:$desktop,backend:$backend}')")
-      printf '| %s | %s | %s |\n' "$target" "$desktop" "$backend" >> "$summary"
+      for gpu in "${selected_gpus[@]}"; do
+        matrix_items+=("$(jq -cn --arg target "$target" --arg desktop "$desktop" --arg backend "$backend" --arg gpu "$gpu" '{target:$target,desktop:$desktop,backend:$backend,gpu:$gpu}')")
+        printf '| %s | %s | %s | %s |\n' "$target" "$desktop" "$gpu" "$backend" >> "$summary"
+      done
     else
       echo "Skipping unsupported combination: $target / $desktop / $backend"
       ((skipped+=1))

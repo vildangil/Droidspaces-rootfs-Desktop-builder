@@ -11,7 +11,7 @@ Build ARM64 Linux RootFS images for Droidspaces on Android with GitHub Actions. 
 ## What it provides
 
 - Seven distribution targets, with X11 and Anland Wayland support depending on the selected profile and distribution.
-- Optional Chinese locale, Fcitx5, Snapdragon GPU support, audio forwarding, development tools, and Docker.
+- Qualcomm/Adreno and MediaTek/Mali GPU profiles (both selectable together in batch builds), optional Chinese locale, Fcitx5, audio forwarding, development tools, and Docker.
 - Automatic GitHub Release publishing, desktop session startup, USB management, and in-container maintenance tools.
 
 ## Documentation
