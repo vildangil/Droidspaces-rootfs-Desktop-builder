@@ -16,14 +16,14 @@ configure_environment() {
         ANLAND=1
         ANLAND_PRESENT_BACKEND=legacy
         ANLAND_SOCKET=/run/display.sock
-        ANLAND_DRM_DEVICE=/dev/dri/renderD128
         ANLAND_SKIP_IMPLICIT_SYNC_WAIT=1
-        XWAYLAND_GBM_DEVICE=/dev/dri/renderD128
     )
     # Only Qualcomm/Adreno builds should hardcode KGSL. This profile used to
     # inject KGSL even when the new MediaTek/Mali option disabled Mesa.
     if [[ "${ENABLE_mesa_ARG:-false}" == "true" ]]; then
         assignments+=(
+            ANLAND_DRM_DEVICE=/dev/dri/renderD128
+            XWAYLAND_GBM_DEVICE=/dev/dri/renderD128
             MESA_LOADER_DRIVER_OVERRIDE=kgsl
             GALLIUM_DRIVER=kgsl
             FD_FORCE_KGSL=1
@@ -48,7 +48,7 @@ configure_environment() {
 install_arch() {
     pacman -S --noconfirm --needed \
         xdg-desktop-portal xdg-desktop-portal-gtk \
-        alacritty foot nautilus fuzzel mako waybar swaybg swaylock wl-clipboard \\
+        alacritty foot nautilus fuzzel mako waybar swaybg swaylock wl-clipboard \
         squeekboard pavucontrol \
         pipewire pipewire-alsa pipewire-pulse wireplumber upower \
         mesa-utils vulkan-tools clinfo dmidecode wayland-utils \
