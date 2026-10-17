@@ -67,6 +67,10 @@ on:
         required: false
         type: string
         default: ''
+      publish_release:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   # --------------------------------------------------------
@@ -314,7 +318,7 @@ jobs:
   release:
     name: ${{ inputs.ui_language == 'zh' && '发布构建结果' || 'Publish build results' }}
     needs: [setup, build]
-    if: ${{ !cancelled() && needs.setup.result == 'success' && needs.build.result == 'success' }}
+    if: ${{ inputs.publish_release && !cancelled() && needs.setup.result == 'success' && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
