@@ -41,7 +41,7 @@ Choose the target, desktop, display backend, and optional features on the GitHub
 | `gpu_profile` | `qualcomm-kgsl` / `mediatek-mali`; default `qualcomm-kgsl` | Single-build GPU profile; selected for English and Chinese workflows. |\n| `enable_mesa` | `true` / `false`; default `true` | Adds Qualcomm Snapdragon GPU/Mesa support *only* for the Qualcomm profile; automatically disabled for Mali. |
 | `enable_8gen2_wayland` | `true` / `false`; default `false` | Sets the Snapdragon 8 Gen 2 Turnip UBWC workaround only on the Qualcomm profile; disabled on Mali. |
 | `nosnap` | `true` / `false` | Ubuntu only: removes Snap and prevents APT from reinstalling it; defaults differ by workflow. |
-| `enable_systemd257` | `true` / `false`; default `false` | Tries the systemd 257 package family for old Android kernels; only `none` and standard `KDE` are supported. |
+| `enable_systemd257` | `true` / `false`; default `false` | Optional old-Android-kernel systemd 257 compatibility. CLI and KDE are supported; Arch + Niri is experimental. Other desktops are rejected rather than silently replaced. |
 | `enable_srf` | `true` / `false` | Installs Fcitx5; enabled by default in the Chinese workflow, disabled in English. |
 | `enable_binfmt` | `true` / `false`; default `false` | Adds binfmt cross-architecture support; not recommended for Arch. |
 | `enable_yj` | `true` / `false`; default `true` | Improves NAT and Android/Droidspaces hardware recognition. |
@@ -93,3 +93,5 @@ not passed through this recommendation file. On kernels without user namespaces,
 the requested KDE setting stays checked but disabled; this does not add kernel support.
 
 Run the mapping and archive checks with `python3 -m unittest discover -s tests -v`.
+
+For batch builds, enable `legacy_systemd257` to test Arch + Niri or KDE with the compatibility package family. It is disabled by default. The release is checksum-verified, but whether it boots depends on the Android kernel. See [Batch builds](batch-builds.md#experimental-systemd-257-for-older-android-kernels-arch--niri).
