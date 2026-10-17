@@ -1,0 +1,82 @@
+{
+  "name": "droidspaces-touch",
+  "layer": "top",
+  "position": "bottom",
+  "height": 68,
+  "spacing": 8,
+  "margin-top": 0,
+  "margin-bottom": 7,
+  "margin-left": 10,
+  "margin-right": 10,
+  "fixed-center": true,
+  "modules-left": [
+    "custom/launcher",
+    "custom/terminal",
+    "custom/files",
+    "custom/overview"
+  ],
+  "modules-center": [
+    "custom/workspace-up",
+    "niri/workspaces",
+    "custom/workspace-down"
+  ],
+  "modules-right": [
+    "pulseaudio",
+    "battery",
+    "clock",
+    "custom/keyboard"
+  ],
+  "custom/launcher": {
+    "format": "MENU",
+    "tooltip": "Open app launcher",
+    "on-click": "fuzzel"
+  },
+  "custom/terminal": {
+    "format": "TERM",
+    "tooltip": "Open a terminal",
+    "on-click": "foot"
+  },
+  "custom/files": {
+    "format": "FILES",
+    "tooltip": "Open files",
+    "on-click": "nautilus"
+  },
+  "custom/overview": {
+    "format": "OVERVIEW",
+    "tooltip": "Show all windows",
+    "on-click": "niri msg action toggle-overview"
+  },
+  "custom/workspace-up": {
+    "format": "◀",
+    "tooltip": "Previous workspace",
+    "on-click": "niri msg action focus-workspace-up"
+  },
+  "custom/workspace-down": {
+    "format": "▶",
+    "tooltip": "Next workspace",
+    "on-click": "niri msg action focus-workspace-down"
+  },
+  "niri/workspaces": {
+    "format": "{index}",
+    "disable-scroll": true
+  },
+  "pulseaudio": {
+    "format": "{volume}%",
+    "format-muted": "MUTE",
+    "tooltip": "Audio volume",
+    "on-click": "pavucontrol"
+  },
+  "battery": {
+    "format": "{capacity}%",
+    "tooltip": "Battery"
+  },
+  "clock": {
+    "format": "{:%H:%M}",
+    "tooltip-format": "{:%A, %d %B %Y}"
+  },
+  "custom/keyboard": {
+    "format": "KEYBOARD",
+    "tooltip": "Show/hide touchscreen keyboard (Squeekboard)",
+    "on-click": "bash $HOME/.local/bin/droidspaces-osk-toggle"
+  }
+}
