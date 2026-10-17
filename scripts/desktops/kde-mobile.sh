@@ -14,7 +14,6 @@ configure_environment() {
         QT_QPA_PLATFORM=wayland
         ANLAND=1
         ANLAND_SOCKET=/run/display.sock
-        ANLAND_DRM_DEVICE=/dev/dri/renderD128
         ANLAND_SKIP_IMPLICIT_SYNC_WAIT=1
     )
 
@@ -22,11 +21,15 @@ configure_environment() {
         echo "KDE mobile 显示后端无效：$backend" >&2
         return 1
     }
-    case "$ID" in
-        arch|archarm|archlinux)
-            assignments+=(XWAYLAND_GBM_DEVICE=/dev/dri/renderD128)
-            ;;
-    esac
+    # Qualcomm renderer paths must not be forced on MediaTek/Mali.
+    if [[ "${ENABLE_mesa_ARG:-false}" == "true" ]]; then
+        assignments+=(ANLAND_DRM_DEVICE=/dev/dri/renderD128)
+        case "$ID" in
+            arch|archarm|archlinux)
+                assignments+=(XWAYLAND_GBM_DEVICE=/dev/dri/renderD128)
+                ;;
+        esac
+    fi
 
     touch "$environment_file"
     for assignment in "${assignments[@]}"; do
