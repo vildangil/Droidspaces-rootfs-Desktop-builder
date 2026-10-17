@@ -6,6 +6,7 @@ Select any number of distributions and desktop environments using GitHub's boole
 
 The default example enables:
 - Arch + Niri
+- Both Qualcomm (Adreno/KGSL) **and** MediaTek (Mali) GPU profiles, resulting in **two distinct archives**
 
 Arch + GNOME is available as an explicit opt-in, but currently requires rebuilt Mutter packages matching the rolling Arch `gnome-shell` ABI.
 
@@ -13,7 +14,9 @@ Debian 13 and every other distribution are off by default. Check their boxes exp
 
 ## GPU family
 
-Select `gpu_profile=mediatek-mali` for Mali/MediaTek. It turns off the Qualcomm-only KGSL Mesa installer and 8 Gen 2 workarounds, regardless of their checkbox values. It does **not** automatically enable native Mali hardware acceleration for AnLand. See [MediaTek / ARM Mali support](mediatek-mali.md) for required kernel GPU buffer interfaces and an X11/VirGL fallback.
+Use independent `gpu_qualcomm` and `gpu_mediatek` checkboxes. When both are checked, **every supported distribution/desktop combination is built twice**, once per GPU profile. By default both are enabled; you can disable either one. Selecting neither fails before any build is scheduled.
+
+For a single build, choose `gpu_profile=qualcomm-kgsl` or `gpu_profile=mediatek-mali` in either the English or Chinese workflow. The MediaTek/Mali profile turns off the Qualcomm-only KGSL Mesa installer and Snapdragon 8 Gen 2 workarounds, regardless of their checkbox values. It does **not** automatically enable native Mali hardware acceleration for AnLand. See [MediaTek / ARM Mali support](mediatek-mali.md) for required kernel GPU buffer interfaces and an X11/VirGL fallback.
 
 ## Supported combinations
 
@@ -31,9 +34,9 @@ For desktop `none`, the workflow always uses the CLI backend and disables deskto
 
 ## Releases and performance
 
-Each pair gets a unique intermediate Actions artifact namespace based on the GitHub run ID, attempt, distro and desktop. **One batch Release tag** is generated from the run ID and attempt; no individual pair creates a Release. This prevents parallel runs from collecting the wrong archives.
+Each distribution/desktop/GPU combination gets a unique intermediate Actions artifact namespace based on the GitHub run ID, attempt, distro, desktop and GPU. **One batch Release tag** is generated from the run ID and attempt; no individual pair creates a Release. This prevents parallel runs from collecting the wrong archives.
 
-Up to three target/profile builds run in parallel. A base RootFS from one Linux distribution is **not** reused for another distribution, and graphical sessions need their own desktop-specific packages. This intentionally preserves the upstream builder's package and AnLand integration.
+Up to three target/profile builds run in parallel. A base RootFS from one Linux distribution is **not** reused for another distribution or GPU choice, and graphical sessions need their own desktop-specific packages. This intentionally preserves the upstream builder's package and AnLand integration.
 
 All other advanced build options remain available through the upstream single-target workflow. View the planner and individual build jobs in the Actions page. Find all `.tar.xz` archives together under a **single** repository Release when the entire batch succeeds.
 
@@ -45,4 +48,4 @@ Arch Linux ARM is rolling-release. If its `gnome-shell` package depends on `libm
 
 ## Single GitHub Release
 
-The batch workflow invokes the reusable core with `publish_release: false`, disabling per-combination Releases. Once **all** selected matrix builds succeed, one final job downloads the archives for the current run and attempt only, verifies that the archive count matches the planned matrix, stages **one** draft release with tag `batch-<run_id>-<attempt>`, and publishes it. A failed build leaves its artifact accessible under the Actions run for debugging but produces no partial GitHub Release. Standalone build workflows keep the prior behavior.
+The batch workflow invokes the reusable core with `publish_release: false`, disabling per-combination Releases. Once **all** selected matrix builds (including both GPU variants, if checked) succeed, one final job downloads the archives for the current run and attempt only, verifies that the archive count matches the planned matrix, stages **one** draft release with tag `batch-<run_id>-<attempt>`, and publishes it. A failed build leaves its artifact accessible under the Actions run for debugging but produces no partial GitHub Release. Standalone build workflows keep the prior behavior.
