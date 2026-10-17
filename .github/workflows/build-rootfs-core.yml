@@ -157,20 +157,21 @@ jobs:
                 message "已启用 systemd 257：普通 KDE 位于验证支持白名单中。" \
                   "systemd 257 is enabled: standard KDE is on the verified support allowlist."
                 ;;
+              niri)
+                [[ "$TARGET" == "Arch" || "$TARGET" == "all" || "$TARGET" == "all-wayland" ]] || {
+                  fail "systemd 257 的 Niri 实验配置仅支持 Arch。" \
+                    "Experimental systemd 257 + Niri is supported only on Arch."
+                }
+                message "Niri + systemd 257 实验模式：用于旧 Android 内核，尚未通过设备启动验证。" \
+                  "Experimental Niri + systemd 257: for old Android kernels; device boot is not yet validated."
+                ;;
               none)
                 DISPLAY_BACKEND="x11"
                 DESKTOP_AUTOSTART="false"
                 ;;
               *)
-                [ "$TARGET" != "all-wayland" ] || {
-                  fail "systemd 257 的 all-wayland 构建只支持普通 KDE。" \
-                    "systemd 257 all-wayland builds only support standard KDE."
-                }
-                message "systemd 257 尚不支持 $DESKTOP：强制使用 none 桌面并关闭桌面开机自启动。" \
-                  "systemd 257 does not support $DESKTOP: forcing desktop=none and disabling desktop auto-start."
-                DESKTOP="none"
-                DISPLAY_BACKEND="x11"
-                DESKTOP_AUTOSTART="false"
+                fail "启用 systemd 257 时仅支持 none、KDE 和 Arch Niri：$DESKTOP" \
+                  "With systemd 257 only none, KDE and Arch Niri are allowed: $DESKTOP"
                 ;;
             esac
           fi
