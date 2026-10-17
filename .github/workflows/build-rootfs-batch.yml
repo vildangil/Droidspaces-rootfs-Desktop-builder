@@ -168,3 +168,91 @@ jobs:
       enable_docker: false
       wayland_package_repository: ${{ inputs.wayland_package_repository }}
       batch_key: batch-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.target }}-${{ matrix.desktop }}
+      publish_release: false
+
+  release:
+    name: Publish all selected RootFS images in one Release
+    needs: [plan, build]
+    # No partial release if any matrix entry failed or was cancelled.
+    if: ${{ needs.plan.result == 'success' && needs.build.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all RootFS archives from this batch run
+        uses: actions/download-artifact@v7
+        with:
+          pattern: batch-${{ github.run_id }}-${{ github.run_attempt }}-*-rootfs
+          merge-multiple: true
+          path: release_assets
+
+      - name: Verify files and prepare release notes
+        env:
+          MATRIX_JSON: ${{ needs.plan.outputs.matrix }}
+          GPU_PROFILE: ${{ inputs.gpu_profile }}
+          USERNAME: ${{ inputs.custom_username }}
+          ANLAND_PACKAGES: ${{ inputs.wayland_package_repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          archives=(release_assets/*.tar.xz)
+          expected="$(jq -r '.include | length' <<<"$MATRIX_JSON")"
+          if (( expected == 0 || ${#archives[@]} != expected )); then
+            printf 'Expected %s RootFS archives, found %s. Refusing partial release.\n' "$expected" "${#archives[@]}" >&2
+            exit 1
+          fi
+          printf '%s\n' "${archives[@]}" | sort -u > release_assets/file-list.txt
+          if [[ "$(wc -l < release_assets/file-list.txt)" -ne "$expected" ]]; then
+            echo "Duplicate RootFS archive names in the batch; aborting." >&2
+            exit 1
+          fi
+          {
+            echo "# DroidSpaces multi-select RootFS"
+            echo
+            echo "All selected compatible distributions and desktops from one Actions run."
+            echo
+            echo "- Build: $RUN_URL"
+            echo "- Username: $USERNAME"
+            echo "- GPU profile: $GPU_PROFILE"
+            echo "- AnLand packages: $ANLAND_PACKAGES"
+            echo
+            echo "## Built combinations"
+            echo
+            echo '| Distribution | Desktop | Backend |'
+            echo '| --- | --- | --- |'
+            jq -r '.include[] | "| \(.target) | \(.desktop) | \(.backend) |"' <<<"$MATRIX_JSON"
+            echo
+            echo "## Files"
+            echo
+            sed 's#^release_assets/#- #' release_assets/file-list.txt
+          } > release-notes.md
+          rm -f release_assets/file-list.txt
+          printf 'Verified %s RootFS images for one release.\n' "$expected"
+
+      - name: Create one draft Release with all RootFS archives
+        id: draft
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: batch-${{ github.run_id }}-${{ github.run_attempt }}
+          target_commitish: ${{ github.sha }}
+          name: DroidSpaces RootFS Batch #${{ github.run_number }} (attempt ${{ github.run_attempt }})
+          body_path: release-notes.md
+          files: release_assets/*.tar.xz
+          fail_on_unmatched_files: true
+          draft: true
+          prerelease: false
+
+      - name: Publish the verified batch Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ steps.draft.outputs.id }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_ID" =~ ^[0-9]+$ ]] || {
+            echo "Draft release ID is missing or invalid." >&2
+            exit 1
+          }
+          gh api --method PATCH "repos/$REPOSITORY/releases/$RELEASE_ID" \
+            -F draft=false --silent
