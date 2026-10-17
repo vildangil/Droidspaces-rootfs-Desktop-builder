@@ -1,0 +1,65 @@
+name: Check Firefox and lightweight apps
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/configure-firefox.sh'
+      - 'scripts/configure-chrome.sh'
+      - 'scripts/desktops/**'
+      - 'dotfiles/niri/**'
+      - '*.Dockerfile'
+      - 'tests/test_lightweight_apps.py'
+      - '.github/workflows/test-lightweight-apps.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/configure-firefox.sh'
+      - 'scripts/configure-chrome.sh'
+      - 'scripts/desktops/**'
+      - 'dotfiles/niri/**'
+      - '*.Dockerfile'
+      - 'tests/test_lightweight_apps.py'
+      - '.github/workflows/test-lightweight-apps.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Verify scripts and package profiles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Shell syntax and browser choices
+        run: |
+          set -euo pipefail
+          bash -n scripts/configure-firefox.sh scripts/configure-chrome.sh
+          for f in scripts/desktops/*.sh; do bash -n "$f"; done
+          python3 -m unittest discover -s tests -p 'test_lightweight_apps.py' -v
+
+  apt-smoke:
+    name: ARM64 Firefox APT test (${{ matrix.distro }})
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: ['debian:13', 'ubuntu:26.04']
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify Firefox installs without Chrome or Snap
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --platform linux/arm64 \
+            -v "$GITHUB_WORKSPACE/scripts/configure-firefox.sh:/configure-firefox.sh:ro" \
+            ${{ matrix.distro }} /bin/bash -euc '
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y --no-install-recommends ca-certificates
+              bash /configure-firefox.sh kde x11
+              command -v firefox || command -v firefox-esr
+              test ! -e /opt/google/chrome/google-chrome
+              ! dpkg-query -W -f="\${Status}" snapd 2>/dev/null | grep -q "install ok installed"
+            '
