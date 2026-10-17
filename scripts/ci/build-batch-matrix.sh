@@ -81,5 +81,5 @@ echo "Scheduled ${#matrix_items[@]} builds; skipped $skipped unsupported combina
   echo
   echo "Scheduled **${#matrix_items[@]}** builds; skipped **$skipped** unsupported combinations."
   echo
-  echo "Each combination creates a separate Release and a separately named RootFS archive."
+  echo "All successfully built combinations are uploaded to one Release per workflow run."
 } >> "$summary"
