@@ -2,7 +2,7 @@
 
 Use **Actions → Build multiple Droidspaces RootFS (multi-select) → Run workflow**.
 
-Select any number of distributions and desktop environments using GitHub's boolean checkboxes. The workflow builds each supported distribution/desktop pair on a native ARM64 runner and publishes a **separate Release** for each pair. It leaves the original single-target workflows unchanged.
+Select any number of distributions and desktop environments using GitHub's boolean checkboxes. The workflow builds each supported distribution/desktop pair on native ARM64 runners and publishes **one GitHub Release containing every successful archive** after the entire batch succeeds. It leaves the original single-target workflows unchanged.
 
 The default example enables:
 - Arch + Niri
@@ -31,11 +31,11 @@ For desktop `none`, the workflow always uses the CLI backend and disables deskto
 
 ## Releases and performance
 
-Each pair gets a unique artifact namespace and Release tag based on the GitHub run ID, attempt, distro, and desktop. This prevents parallel runs from collecting the wrong archives or publishing to the same tag.
+Each pair gets a unique intermediate Actions artifact namespace based on the GitHub run ID, attempt, distro and desktop. **One batch Release tag** is generated from the run ID and attempt; no individual pair creates a Release. This prevents parallel runs from collecting the wrong archives.
 
 Up to three target/profile builds run in parallel. A base RootFS from one Linux distribution is **not** reused for another distribution, and graphical sessions need their own desktop-specific packages. This intentionally preserves the upstream builder's package and AnLand integration.
 
-All other advanced build options remain available through the upstream single-target workflow. View the planner and individual build jobs in the Actions page. Find each resulting `.tar.xz` archive on the repository's Releases page.
+All other advanced build options remain available through the upstream single-target workflow. View the planner and individual build jobs in the Actions page. Find all `.tar.xz` archives together under a **single** repository Release when the entire batch succeeds.
 
 **First boot:** change the default password after importing the rootfs. See [Quick Start](quick-start.md) and [AnLand setup](desktop-and-anland.md).
 
