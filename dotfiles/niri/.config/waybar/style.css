@@ -1,7 +1,7 @@
 * {
   font-family: "Noto Sans", sans-serif;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   min-height: 0;
 }
 window#waybar {
@@ -20,8 +20,8 @@ tooltip {
 #custom-overview, #custom-workspace-up, #custom-workspace-down,
 #custom-keyboard, #clock, #battery, #pulseaudio, #workspaces button {
   min-height: 48px;
-  padding: 0 15px;
-  margin: 6px 1px;
+  padding: 0 9px;
+  margin: 6px 0;
   border-radius: 13px;
   color: #e5efff;
   background: #263650;
