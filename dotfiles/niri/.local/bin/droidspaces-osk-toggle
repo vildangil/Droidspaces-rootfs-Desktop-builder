@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Toggle Squeekboard using its own D-Bus API, not Niri keyboard shortcuts.
+set -euo pipefail
+command -v busctl >/dev/null || { echo "busctl is unavailable" >&2; exit 1; }
+if ! busctl --user status sm.puri.OSK0 >/dev/null 2>&1; then
+    # The compositor session may not have started the OSK yet.
+    command -v squeekboard >/dev/null || { echo "Install squeekboard first" >&2; exit 1; }
+    (squeekboard >/dev/null 2>&1 &) || true
+    sleep 1
+fi
+visible="$(busctl --user call sm.puri.OSK0 /sm/puri/OSK0 sm.puri.OSK0 GetVisible)"
+case "$visible" in
+    *true*)  new_state=false ;;
+    *false*) new_state=true ;;
+    *) echo "Could not read Squeekboard visibility: $visible" >&2; exit 1 ;;
+esac
+busctl --user call sm.puri.OSK0 /sm/puri/OSK0 sm.puri.OSK0 SetVisible b "$new_state"
