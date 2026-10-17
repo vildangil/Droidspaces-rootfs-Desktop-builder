@@ -236,7 +236,7 @@ jobs:
         with:
           tag_name: batch-${{ github.run_id }}-${{ github.run_attempt }}
           target_commitish: ${{ github.sha }}
-          name: DroidSpaces RootFS Batch #${{ github.run_number }} (attempt ${{ github.run_attempt }})
+          name: "DroidSpaces RootFS Batch #${{ github.run_number }} (attempt ${{ github.run_attempt }})"
           body_path: release-notes.md
           files: release_assets/*.tar.xz
           fail_on_unmatched_files: true
