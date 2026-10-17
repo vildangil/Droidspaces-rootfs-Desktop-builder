@@ -19,8 +19,11 @@ configure_environment() {
         QT_QPA_PLATFORM=wayland
         ANLAND=1
         ANLAND_SOCKET=/run/display.sock
-        ANLAND_DRM_DEVICE=/dev/dri/renderD128
     )
+    # Do not force a Qualcomm render node when the MTK/Mali profile is selected.
+    if [[ "${ENABLE_mesa_ARG:-false}" == "true" ]]; then
+        assignments+=(ANLAND_DRM_DEVICE=/dev/dri/renderD128)
+    fi
 
     [[ "$backend" == anland-wayland ]] || {
         echo "GNOME 显示后端无效：$backend" >&2

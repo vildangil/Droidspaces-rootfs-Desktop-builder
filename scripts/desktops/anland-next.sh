@@ -7,9 +7,8 @@ configure_environment() {
     local backend="${1:-}"
     local environment_file="${ROOTFS_DIR:-}/etc/environment"
     local assignment key
-    # 只放 anland 这条链路真正读或发布的变量：ANLAND_RUNTIME_DIR 是宿主
-    # runtime dir 的容器视角（droidspaces 绑定挂载到 /run/anland），三个 GPU
-    # 变量是 kgsl/freedreno 路径，XDG_SESSION_TYPE 由会话转发给应用。
+    # ANLAND_RUNTIME_DIR points to the host runtime bind mount. KGSL/freedreno
+    # variables are Qualcomm-only and must not leak into Mali RootFS images.
     # WAYLAND_DISPLAY 故意不写：会话会检查 $ANLAND_RUNTIME_DIR/$WAYLAND_DISPLAY
     # 处的宿主 socket，再把应用侧的 wayland-anland 链接发布出去，写死任一种
     # 都会把会话弄坏。
@@ -17,12 +16,17 @@ configure_environment() {
         XDG_SESSION_CLASS=user
         XDG_SESSION_TYPE=wayland
         ANLAND_RUNTIME_DIR=/run/anland
-        MESA_LOADER_DRIVER_OVERRIDE=kgsl
-        GALLIUM_DRIVER=kgsl
-        FD_FORCE_KGSL=1
         DISPLAY=:0
         QT_QPA_PLATFORM=wayland
     )
+
+    if [[ "${ENABLE_mesa_ARG:-false}" == "true" ]]; then
+        assignments+=(
+            MESA_LOADER_DRIVER_OVERRIDE=kgsl
+            GALLIUM_DRIVER=kgsl
+            FD_FORCE_KGSL=1
+        )
+    fi
 
     [[ "$backend" == anland-wayland ]] || {
         echo "Anland Next 显示后端无效：$backend" >&2
