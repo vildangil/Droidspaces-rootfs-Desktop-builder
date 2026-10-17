@@ -50,7 +50,7 @@ install_apt() {
                 kwin-wayland pipewire pipewire-alsa pipewire-pulse wireplumber powerdevil plasma-pa upower pulseaudio-utils \
                 konsole dolphin kate kinfocenter mesa-utils vulkan-tools \
                 systemsettings plasma-systemmonitor kde-config-screenlocker kio-extras xdg-user-dirs \
-                dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers kimageformat6-plugins plasma-settings angelfish \
+                dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers kimageformat6-plugins plasma-settings \
                 gstreamer1.0-plugins-base gstreamer1.0-plugins-good sound-theme-freedesktop libcanberra-pulse \
                 polkit-kde-agent-1 libpam-systemd libpam-modules libpam-kwallet5 \
                 breeze-icon-theme plasma-desktoptheme libqt6svg6 qt6-svg-plugins \
@@ -64,7 +64,7 @@ install_apt() {
                 kwin-wayland pipewire pipewire-alsa pipewire-pulse wireplumber powerdevil plasma-pa upower pulseaudio-utils \
                 konsole dolphin kate kinfocenter mesa-utils vulkan-tools \
                 systemsettings plasma-systemmonitor kde-config-screenlocker kio-extras xdg-user-dirs \
-                dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers kimageformat6-plugins plasma-settings angelfish \
+                dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers kimageformat6-plugins plasma-settings \
                 gstreamer1.0-plugins-base gstreamer1.0-plugins-good sound-theme-freedesktop libcanberra-pulse \
                 polkit-kde-agent-1 libpam-systemd libpam-modules libpam-kwallet5 qml6-module-org-kde-kirigami qml6-module-qtquick-controls \
                 qml6-module-qtquick-layouts qml6-module-qtquick-templates language-pack-kde-zh-hans language-pack-zh-hans qt6-translations-l10n
@@ -90,7 +90,7 @@ install_fedora() {
         kwin pipewire pipewire-alsa pipewire-pulseaudio wireplumber powerdevil plasma-pa upower pulseaudio-utils \
         konsole dolphin kate kinfocenter glx-utils vulkan-tools \
         systemsettings plasma-systemmonitor kscreenlocker kio-extras xdg-user-dirs \
-        dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers kf6-kimageformats plasma-settings angelfish \
+        dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers kf6-kimageformats plasma-settings \
         gstreamer1-plugins-base gstreamer1-plugins-good sound-theme-freedesktop libcanberra-gtk3 \
         polkit-kde-agent-1 plasma-workspace breeze-icon-theme plasma-breeze qt6-qtsvg \
         kf6-kirigami qt6-qtquickcontrols2 qt6-qtdeclarative glibc-langpack-zh
@@ -104,10 +104,10 @@ install_arch() {
         kwin qt6-wayland qt6-svg qt6-virtualkeyboard wayland-utils xorg-server \
         pipewire pipewire-alsa pipewire-pulse wireplumber powerdevil plasma-pa upower \
         kscreen ark konsole qmlkonsole dolphin kate kinfocenter mesa-utils libpulse vulkan-tools \
-        aha clinfo dmidecode kfind plasma-systemmonitor filelight glmark2 vkmark \
+        aha clinfo dmidecode kfind plasma-systemmonitor filelight \
         systemsettings kscreenlocker kio-extras xdg-user-dirs \
         dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers kimageformats \
-        plasma-browser-integration angelfish kclock libcanberra \
+        plasma-browser-integration kclock libcanberra \
         gstreamer gst-plugins-base gst-plugins-good sound-theme-freedesktop polkit-kde-agent
 }
 
