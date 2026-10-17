@@ -36,7 +36,9 @@ class GpuBatchMatrixTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             output = pathlib.Path(tmp) / "output"
             summary = pathlib.Path(tmp) / "summary"
-            env = dict(os.environ, **BASE_FLAGS, **settings)
+            env = dict(os.environ)
+            env.update(BASE_FLAGS)
+            env.update(settings)
             env["GITHUB_OUTPUT"] = str(output)
             env["GITHUB_STEP_SUMMARY"] = str(summary)
             result = subprocess.run(
