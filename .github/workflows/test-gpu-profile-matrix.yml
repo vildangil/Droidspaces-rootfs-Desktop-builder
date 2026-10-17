@@ -1,0 +1,36 @@
+name: Check GPU profiles and build matrix
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/ci/build-batch-matrix.sh'
+      - 'scripts/lib/desktop-config.sh'
+      - 'build_rootfs-native.sh'
+      - 'tests/test_gpu_batch_matrix.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/ci/build-batch-matrix.sh'
+      - 'scripts/lib/desktop-config.sh'
+      - 'build_rootfs-native.sh'
+      - 'tests/test_gpu_batch_matrix.py'
+
+permissions:
+  contents: read
+
+jobs:
+  gpu-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check shell syntax
+        run: |
+          bash -n scripts/ci/build-batch-matrix.sh
+          bash -n build_rootfs-native.sh
+          for profile in scripts/desktops/*.sh; do
+            bash -n "$profile"
+          done
+      - name: Test Qualcomm and MediaTek combinations
+        run: python3 -m unittest discover -s tests -p 'test_gpu_batch_matrix.py' -v
