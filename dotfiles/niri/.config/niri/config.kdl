@@ -3,8 +3,14 @@
 // Change the bindings in your personal config; this is only the shipped default.
 
 input {
-    keyboard { xkb { } }
-    touchpad { tap; natural-scroll; }
+    keyboard {
+        xkb {
+        }
+    }
+    touchpad {
+        tap
+        natural-scroll
+    }
 }
 
 hotkey-overlay { skip-at-startup; }
@@ -34,7 +40,9 @@ window-rule {
 
 // Top-left hot corner opens the overview; edge drag-and-drop is touch usable.
 gestures {
-    hot-corners { top-left; }
+    hot-corners {
+        top-left
+    }
     dnd-edge-view-scroll {
         trigger-width 72
         delay-ms 90
