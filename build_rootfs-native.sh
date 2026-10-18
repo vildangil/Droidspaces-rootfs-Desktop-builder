@@ -3,6 +3,8 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$REPO_DIR/scripts/lib/desktop-config.sh"
 source "$REPO_DIR/scripts/lib/anland-build.sh"
 source "$REPO_DIR/scripts/lib/rootfs-config.sh"
+source "$REPO_DIR/scripts/lib/legacy-desktop.sh"
+source "$REPO_DIR/scripts/lib/verify-rootfs-desktop.sh"
 
 : "${VERSION:=dev}"
 ARCH=$(uname -m)          # 获取当前系统架构
@@ -70,27 +72,13 @@ case "$GPU_PROFILE" in
     ;;
   *) echo "错误：-G 只支持 qualcomm-kgsl 或 mediatek-mali。" >&2; exit 1 ;;
 esac
-case "$ENABLE_systemd257" in
-  true)
-    case "$DESKTOP" in
-      kde)
-        echo "提示：systemd 257 已启用，普通 KDE 位于验证支持白名单中。"
-        ;;
-      none)
-        DISPLAY_BACKEND="x11"
-        DESKTOP_AUTOSTART="false"
-        ;;
-      *)
-        echo "提示：systemd 257 尚不支持 $DESKTOP，强制使用 none 桌面并关闭桌面自启动。"
-        DESKTOP="none"
-        DISPLAY_BACKEND="x11"
-        DESKTOP_AUTOSTART="false"
-        ;;
-    esac
-    ;;
-  false) ;;
-  *) echo "错误：-S 只支持 true 或 false。" >&2; exit 1 ;;
-esac
+# CLI imports don't need desktop autostart. All other combinations are
+# checked *after* determining the actual distribution; never mutate an
+# explicitly requested Niri/KDE image into an unrelated CLI image.
+if [[ "$ENABLE_systemd257" == true && "$DESKTOP" == none ]]; then
+  DISPLAY_BACKEND="x11"
+  DESKTOP_AUTOSTART="false"
+fi
 
 if [[ "$DESKTOP" == kde-mobile || "$DESKTOP" == gnome || "$DESKTOP" == anland-next || "$DESKTOP" == niri ]]; then
   DISPLAY_BACKEND="anland-wayland"
@@ -114,6 +102,9 @@ fi
 
 # 提取发行版目标名称（例如：Debian-13.Dockerfile -> Debian-13）
 PREFIX="$(basename "${DOCKERFILE%.Dockerfile}")"
+
+# Abort unsupported systemd-257 desktop requests instead of silently exporting none.
+validate_legacy_desktop "$ENABLE_systemd257" "$DESKTOP" "$PREFIX" || exit 1
 
 if ! desktop_target_supported "$PREFIX" "$DESKTOP"; then
   echo "错误：$PREFIX 不支持桌面 $DESKTOP。" >&2
@@ -216,6 +207,9 @@ docker buildx build \
 
 
 
+
+echo "正在验证 RootFS 桌面信息和启动文件..."
+verify_rootfs_desktop_tar "$TEMP_TAR" "$DESKTOP" "$DISPLAY_BACKEND" || exit 1
 
 echo "正在写入推荐配置并压缩构建产物..."
 package_rootfs_with_config "$TEMP_TAR" "$FINAL_NAME" "$DESKTOP" "$DISPLAY_BACKEND" \
