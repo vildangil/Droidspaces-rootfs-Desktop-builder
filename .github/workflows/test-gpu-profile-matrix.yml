@@ -13,6 +13,9 @@ on:
       - 'scripts/start/desktop-session.service'
       - 'tests/test_desktop_session_unit.py'
       - 'tests/test_gpu_batch_matrix.py'
+      - 'scripts/lib/legacy-desktop.sh'
+      - 'scripts/lib/verify-rootfs-desktop.sh'
+      - 'tests/test_legacy_niri_export.py'
   push:
     branches: [main]
     paths:
@@ -26,6 +29,9 @@ on:
       - 'scripts/start/desktop-session.service'
       - 'tests/test_desktop_session_unit.py'
       - 'tests/test_gpu_batch_matrix.py'
+      - 'scripts/lib/legacy-desktop.sh'
+      - 'scripts/lib/verify-rootfs-desktop.sh'
+      - 'tests/test_legacy_niri_export.py'
 
 permissions:
   contents: read
@@ -39,6 +45,7 @@ jobs:
         run: |
           bash -n scripts/ci/build-batch-matrix.sh
           bash -n build_rootfs-native.sh
+          bash -n scripts/lib/legacy-desktop.sh scripts/lib/verify-rootfs-desktop.sh
           for profile in scripts/desktops/*.sh; do
             bash -n "$profile"
           done
@@ -47,3 +54,4 @@ jobs:
           python3 -m unittest discover -s tests -p 'test_gpu_batch_matrix.py' -v
           python3 -m unittest discover -s tests -p 'test_rootfs_gpu_config.py' -v
           python3 -m unittest discover -s tests -p 'test_desktop_session_unit.py' -v
+          python3 -m unittest discover -s tests -p 'test_legacy_niri_export.py' -v
