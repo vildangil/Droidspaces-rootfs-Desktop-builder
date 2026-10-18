@@ -23,12 +23,12 @@ verify_rootfs_desktop_tar() {
         echo "Failed to list exported RootFS archive" >&2
         return 1
     fi
-    if ! grep -Eq '^((\\./)?etc/systemd/system/desktop-session\\.service)$' <<< "$members"; then
+    if ! grep -Eq "^([.]/)?etc/systemd/system/desktop-session[.]service$" <<< "$members"; then
         echo "Graphical RootFS export lacks desktop-session.service" >&2
         return 1
     fi
     if [[ "$expected_desktop" == "niri" ]]; then
-        if ! grep -Eq '^((\\./)?usr/bin/niri-anland)$' <<< "$members"; then
+        if ! grep -Eq "^([.]/)?usr/bin/niri-anland$" <<< "$members"; then
             echo "Niri export has no /usr/bin/niri-anland; refusing to release a CLI-only image as Niri" >&2
             return 1
         fi
